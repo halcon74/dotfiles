@@ -1,0 +1,2 @@
+MY_OVERLAY_DIR=/var/db/repos/localrepo
+MY_REPO_DIR=/home/user/myPrograms/myOverlay
