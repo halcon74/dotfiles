@@ -276,11 +276,11 @@ function check_diff {
 	echo
 	echo
 
-	local MY_DIFF=$(diff -ur "${MY_REPO_DIR}" "${MY_OVERLAY_DIR}" | grep -v ': \.hg')
+	local DIFF_UR=$(diff -ur "${MY_REPO_DIR}" "${MY_OVERLAY_DIR}" | grep -v ': \.hg')
 	
-	if [[ "$MY_DIFF" != '' ]]; then
-		exit_err_1 'MY_DIFF non-empty: 
-'"${MY_DIFF}"
+	if [[ "$DIFF_UR" != '' ]]; then
+		exit_err_1 'DIFF_UR non-empty: 
+'"${DIFF_UR}"
 	fi
 
 }
