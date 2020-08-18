@@ -264,7 +264,7 @@ function handle_folders {
 				handle_tree_files 'no_check'
 			else
 				add_to_my_active_path "$FIND_SUBFOLDERNAME"
-				exit_err_1 'Wrong folder '"${MY_ACTIVE_PATH}"
+				exit_err_1 'Wrong subfolder '"${MY_ACTIVE_PATH}"
 			fi
 		done
 	done
