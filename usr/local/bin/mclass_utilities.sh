@@ -26,15 +26,15 @@ function find_in_array {
 	shift
 	local ARG_ARRAY=("$@")
 	
-	local MY_FOUND=0
-	for MY_EACH in ${ARG_ARRAY[@]}; do
-		if [[ "$ARG_VALUE" == "$MY_EACH" ]]; then
-			MY_FOUND=1
+	local FOUND=0
+	for EACH in ${ARG_ARRAY[@]}; do
+		if [[ "$ARG_VALUE" == "$EACH" ]]; then
+			FOUND=1
 			break
 		fi
 	done
 	
-	echo $MY_FOUND
+	echo $FOUND
 
 }
 
