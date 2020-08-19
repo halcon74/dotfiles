@@ -51,6 +51,8 @@ Exiting 1.'
 
 }
 
+# calling example: 
+# MY_OVERLAY_DIR=$(read_from_conffile 'MY_OVERLAY_DIR' "$MY_CONFFILE")
 function read_from_conffile {
 
 	local THE_NAME="$1"
