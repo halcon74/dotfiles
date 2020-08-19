@@ -25,8 +25,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 MY_CONFFILE='/usr/local/bin/installer_halconoverlay.conf'
 
-MY_OVERLAY_DIR=$(grep 'MY_OVERLAY_DIR' "$MY_CONFFILE" | sed -n '1p' | cut -d '=' -f2)
-MY_REPO_DIR=$(grep 'MY_REPO_DIR' "$MY_CONFFILE" | sed -n '1p' | cut -d '=' -f2)
+MY_OVERLAY_DIR=$(grep 'MY_OVERLAY_DIR' "$MY_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | cut -d '=' -f2)
+MY_REPO_DIR=$(grep 'MY_REPO_DIR' "$MY_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | cut -d '=' -f2)
 
 if [[ -z "$MY_OVERLAY_DIR" ]]; then
 	exit_err_1 'MY_OVERLAY_DIR is not set'
@@ -157,7 +157,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 		read USER_CHOICE
 		
-		if [[ "$USER_CHOICE" == 'y' ]]; then
+		if [[ "$USER_CHOICE" == 'y' ]] || [[ "$USER_CHOICE" == 'Y' ]]; then
 			echo
 			set -x
 			rm -r "$MY_OVERLAY_DIR"
