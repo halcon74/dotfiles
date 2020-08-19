@@ -176,6 +176,8 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 }
 
 function handle_service_files {
+
+	local CATEGORY_NAME="$1"
 	
 	local FIND_FILES=$(find "${MY_REPO_DIR}${MY_ACTIVE_PATH}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
@@ -183,20 +185,28 @@ function handle_service_files {
 		local FIND_FILENAME=$(basename "$FIND_FILE")
 		echo
 		
-		set_my_active_files "$CATEGORY_NAME" 0
-		local FOUND_IN_MY_FILES=$(find_in_array "$FIND_FILENAME" "${MY_ACTIVE_FILES[@]}")
-		
-		if [[ $FOUND_IN_MY_FILES -eq 1 ]]; then
-			set_my_active_files "$CATEGORY_NAME" 1
-			local FOUND_IN_MY_PORTAGE_FILES=$(find_in_array "$FIND_FILENAME" "${MY_ACTIVE_FILES[@]}")
-			
-			if [[ $FOUND_IN_MY_PORTAGE_FILES -eq 1 ]]; then
+		if [[ "$CATEGORY_NAME" == 'eclass' ]]; then
+			if [[ "$FIND_FILENAME" =~ ^.+\.eclass$ ]]; then
 				cp_n_chown 'portage' "$FIND_FILENAME"
 			else
-				cp_n_chown 'root' "$FIND_FILENAME"
+				exit_err_1 'Wrong service file '"${MY_ACTIVE_PATH}"'/'"$FIND_FILENAME"
 			fi
 		else
-			exit_err_1 'Wrong service file '"${MY_ACTIVE_PATH}"'/'"$FIND_FILENAME"
+			set_my_active_files "$CATEGORY_NAME" 0
+			local FOUND_IN_MY_FILES=$(find_in_array "$FIND_FILENAME" "${MY_ACTIVE_FILES[@]}")
+			
+			if [[ $FOUND_IN_MY_FILES -eq 1 ]]; then
+				set_my_active_files "$CATEGORY_NAME" 1
+				local FOUND_IN_MY_PORTAGE_FILES=$(find_in_array "$FIND_FILENAME" "${MY_ACTIVE_FILES[@]}")
+				
+				if [[ $FOUND_IN_MY_PORTAGE_FILES -eq 1 ]]; then
+					cp_n_chown 'portage' "$FIND_FILENAME"
+				else
+					cp_n_chown 'root' "$FIND_FILENAME"
+				fi
+			else
+				exit_err_1 'Wrong service file '"${MY_ACTIVE_PATH}"'/'"$FIND_FILENAME"
+			fi
 		fi
 	done
 
@@ -297,10 +307,8 @@ function main {
 		add_to_my_active_path "$CATEGORY_NAME"
 		mkdir_n_chown 'portage'
 		
-		if [[ "$CATEGORY_NAME" == 'metadata' ]]; then
-			handle_service_files
-		elif [[ "$CATEGORY_NAME" == 'profiles' ]]; then
-			handle_service_files
+		if [[ "$CATEGORY_NAME" == 'metadata' ]] || [[ "$CATEGORY_NAME" == 'profiles' ]] || [[ "$CATEGORY_NAME" == 'eclass' ]]; then
+			handle_service_files "$CATEGORY_NAME"
 		elif [[ "$CATEGORY_NAME" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
 		else
