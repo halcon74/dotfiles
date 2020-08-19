@@ -25,8 +25,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 MY_CONFFILE='/usr/local/bin/installer_halconoverlay.conf'
 
-MY_OVERLAY_DIR=$(grep 'MY_OVERLAY_DIR' "$MY_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | cut -d '=' -f2)
-MY_REPO_DIR=$(grep 'MY_REPO_DIR' "$MY_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | cut -d '=' -f2)
+MY_OVERLAY_DIR=$(read_from_conffile 'MY_OVERLAY_DIR' "$MY_CONFFILE")
+MY_REPO_DIR=$(read_from_conffile 'MY_REPO_DIR' "$MY_CONFFILE")
 
 if [[ -z "$MY_OVERLAY_DIR" ]]; then
 	exit_err_1 'MY_OVERLAY_DIR is not set'
