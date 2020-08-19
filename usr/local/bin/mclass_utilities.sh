@@ -51,4 +51,15 @@ Exiting 1.'
 
 }
 
+function read_from_conffile {
+
+	local THE_NAME="$1"
+	local THE_CONFFILE="$2"
+	
+	local THE_VALUE=$(grep "$THE_NAME" "$THE_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"$THE_NAME"'=(.+)$/\1/')
+	
+	echo "$THE_VALUE"
+
+}
+
 echo 'Inherited: mclass_utilities'
