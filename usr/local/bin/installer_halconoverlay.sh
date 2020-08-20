@@ -183,7 +183,7 @@ function handle_service_files {
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
-		local __find_filename=$(basename "${__find_file}")
+		local __find_filename="${__find_file##*/}"
 		echo
 		
 		if [[ "${__category_name}" == 'eclass' ]]; then
@@ -221,7 +221,7 @@ function handle_tree_files {
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
-		local __find_filename=$(basename "${__find_file}")
+		local __find_filename="${__find_file##*/}"
 		echo
 		
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
@@ -257,7 +257,7 @@ function handle_folders {
 	
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
-		local __find_foldername=$(basename "${__find_folder}")
+		local __find_foldername="${__find_folder##*/}"
 		
 		add_to_my_active_path "${__find_foldername}"
 		mkdir_n_chown 'portage'
@@ -267,7 +267,7 @@ function handle_folders {
 		
 		local __find_subfolder
 		for __find_subfolder in $(echo "${__find_subfolders}"); do
-			local __find_subfoldername=$(basename "${__find_subfolder}")
+			local __find_subfoldername="${__find_subfolder##*/}"
 			echo
 			
 			local __found_in_my_subfolders=$(find_in_array "${__find_subfoldername}" "${_subfolders[@]}")
@@ -305,7 +305,7 @@ function main {
 
 	local __my_category
 	for __my_category in $(echo "${_categories}"); do	
-		local __category_name=$(basename "${__my_category}")
+		local __category_name="${__my_category##*/}"
 		echo
 		
 		clear_my_active_path
