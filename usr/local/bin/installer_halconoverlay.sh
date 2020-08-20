@@ -148,19 +148,19 @@ function cp_n_chown {
 
 function handle_overlay_dir {
 
-	if [[ -d "$OVERLAY_DIR" ]]; then
+	if [[ -d "${OVERLAY_DIR}" ]]; then
 		echo
 		echo 'ATTENTION! Delete this directory?
-   '"$OVERLAY_DIR"'
+   '"${OVERLAY_DIR}"'
 (y/n)
 If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
 		read USER_CHOICE
 		
-		if [[ "$USER_CHOICE" == 'y' || "$USER_CHOICE" == 'Y' ]]; then
+		if [[ "${USER_CHOICE}" == 'y' || "${USER_CHOICE}" == 'Y' ]]; then
 			echo
 			set -x
-			rm -r "$OVERLAY_DIR"
+			rm -r "${OVERLAY_DIR}"
 			set +x
 		else
 			echo
@@ -177,36 +177,36 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_service_files {
 
-	local __category_name="$1"
+	local __category_name="${1}"
 	
 	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
 	local __find_file
-	for __find_file in $(echo "$__find_files"); do
-		local __find_filename=$(basename "$__find_file")
+	for __find_file in $(echo "${__find_files}"); do
+		local __find_filename=$(basename "${__find_file}")
 		echo
 		
-		if [[ "$__category_name" == 'eclass' ]]; then
-			if [[ "$__find_filename" =~ ^.+\.eclass$ ]]; then
-				cp_n_chown 'portage' "$__find_filename"
+		if [[ "${__category_name}" == 'eclass' ]]; then
+			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
+				cp_n_chown 'portage' "${__find_filename}"
 			else
-				exit_err_1 'Wrong service file '"${_active_path}"'/'"$__find_filename"
+				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
 			fi
 		else
-			set_my_active_files "$__category_name" 0
-			local __find_in_my_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
+			set_my_active_files "${__category_name}" 0
+			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 			
-			if [[ $__find_in_my_files -eq 1 ]]; then
-				set_my_active_files "$__category_name" 1
-				local __found_in_my_portage_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
+			if [[ ${__find_in_my_files} -eq 1 ]]; then
+				set_my_active_files "${__category_name}" 1
+				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 				
-				if [[ $__found_in_my_portage_files -eq 1 ]]; then
-					cp_n_chown 'portage' "$__find_filename"
+				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
+					cp_n_chown 'portage' "${__find_filename}"
 				else
-					cp_n_chown 'root' "$__find_filename"
+					cp_n_chown 'root' "${__find_filename}"
 				fi
 			else
-				exit_err_1 'Wrong service file '"${_active_path}"'/'"$__find_filename"
+				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
 			fi
 		fi
 	done
@@ -215,36 +215,36 @@ function handle_service_files {
 
 function handle_tree_files {
 
-	local __no_tree_check="$1"
+	local __no_tree_check="${1}"
 	
 	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
 	local __find_file
-	for __find_file in $(echo "$__find_files"); do
-		local __find_filename=$(basename "$__find_file")
+	for __find_file in $(echo "${__find_files}"); do
+		local __find_filename=$(basename "${__find_file}")
 		echo
 		
-		if [[ -n "$__no_tree_check" && "$__no_tree_check" == 'no_check' ]]; then
-			local __find_in_my_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
+		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
+			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 			
-			cp_n_chown 'root' "$__find_filename"
+			cp_n_chown 'root' "${__find_filename}"
 		else
 			set_my_active_files 'tree' 0
-			local __find_in_my_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
+			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 			
-			if [[ $__find_in_my_files -eq 1 ]]; then
+			if [[ ${__find_in_my_files} -eq 1 ]]; then
 				set_my_active_files 'tree' 1
-				local __found_in_my_portage_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
+				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 				
-				if [[ $__found_in_my_portage_files -eq 1 ]]; then
-					cp_n_chown 'portage' "$__find_filename"
+				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
+					cp_n_chown 'portage' "${__find_filename}"
 				else
-					cp_n_chown 'root' "$__find_filename"
+					cp_n_chown 'root' "${__find_filename}"
 				fi
-			elif [[ "$__find_filename" =~ ^.+\.ebuild$ ]]; then
-				cp_n_chown 'root' "$__find_filename"
+			elif [[ "${__find_filename}" =~ ^.+\.ebuild$ ]]; then
+				cp_n_chown 'root' "${__find_filename}"
 			else
-				exit_err_1 'Wrong tree file '"${_active_path}"'/'"$__find_filename"
+				exit_err_1 'Wrong tree file '"${_active_path}"'/'"${__find_filename}"
 			fi
 		fi
 	done
@@ -256,28 +256,28 @@ function handle_folders {
 	local __find_folders=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	
 	local __find_folder
-	for __find_folder in $(echo "$__find_folders"); do
-		local __find_foldername=$(basename "$__find_folder")
+	for __find_folder in $(echo "${__find_folders}"); do
+		local __find_foldername=$(basename "${__find_folder}")
 		
-		add_to_my_active_path "$__find_foldername"
+		add_to_my_active_path "${__find_foldername}"
 		mkdir_n_chown 'portage'
 		handle_tree_files ''
 		
 		local __find_subfolders=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 		
 		local __find_subfolder
-		for __find_subfolder in $(echo "$__find_subfolders"); do
-			local __find_subfoldername=$(basename "$__find_subfolder")
+		for __find_subfolder in $(echo "${__find_subfolders}"); do
+			local __find_subfoldername=$(basename "${__find_subfolder}")
 			echo
 			
-			local __found_in_my_subfolders=$(find_in_array "$__find_subfoldername" "${_subfolders[@]}")
+			local __found_in_my_subfolders=$(find_in_array "${__find_subfoldername}" "${_subfolders[@]}")
 			
-			if [[ $__found_in_my_subfolders -eq 1 ]]; then
-				add_to_my_active_path "$__find_subfoldername"
+			if [[ ${__found_in_my_subfolders} -eq 1 ]]; then
+				add_to_my_active_path "${__find_subfoldername}"
 				mkdir_n_chown 'root'
 				handle_tree_files 'no_check'
 			else
-				add_to_my_active_path "$__find_subfoldername"
+				add_to_my_active_path "${__find_subfoldername}"
 				exit_err_1 'Wrong subfolder '"${_active_path}"
 			fi
 		done
@@ -292,7 +292,7 @@ function check_diff {
 
 	local __diff_ur=$(diff -ur "${HG_REPO_DIR}" "${OVERLAY_DIR}" | grep -v ': \.hg')
 	
-	if [[ "$__diff_ur" != '' ]]; then
+	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 
 '"${__diff_ur}"
 	fi
@@ -304,20 +304,20 @@ function main {
 	handle_overlay_dir
 
 	local __my_category
-	for __my_category in $(echo "$_categories"); do	
-		local __category_name=$(basename "$__my_category")
+	for __my_category in $(echo "${_categories}"); do	
+		local __category_name=$(basename "${__my_category}")
 		echo
 		
 		clear_my_active_path
-		add_to_my_active_path "$__category_name"
+		add_to_my_active_path "${__category_name}"
 		mkdir_n_chown 'portage'
 		
-		if [[ "$__category_name" == 'metadata' || "$__category_name" == 'profiles' || "$__category_name" == 'eclass' ]]; then
-			handle_service_files "$__category_name"
-		elif [[ "$__category_name" =~ ^[^\-]+\-[^\-]+$ ]]; then
+		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' ]]; then
+			handle_service_files "${__category_name}"
+		elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
 		else
-			exit_err_1 'Wrong category: '"$__category_name"
+			exit_err_1 'Wrong category: '"${__category_name}"
 		fi
 	done
 	
