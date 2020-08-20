@@ -1,4 +1,4 @@
 # Comments are supported:
-# MY_OVERLAY_DIR=/non/existing
-MY_OVERLAY_DIR=/var/db/repos/localrepo
-MY_REPO_DIR=/home/user/myPrograms/myOverlay
+# OVERLAY_DIR=/non/existing
+OVERLAY_DIR=/var/db/repos/localrepo
+HG_REPO_DIR=/home/user/myPrograms/myOverlay
