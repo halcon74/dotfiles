@@ -95,7 +95,7 @@ function add_to_my_active_path {
 
 	local __adding_path="$1"
 	
-	if [[ -z "$__adding_path" ]] || [[ "$__adding_path" =~ [\/] ]] || [[ "$__adding_path" =~ [[:space:]] ]]; then
+	if [[ -z "$__adding_path" || "$__adding_path" =~ [\/] || "$__adding_path" =~ [[:space:]] ]]; then
 		exit_err_1 'Wrong __adding_path '"$__adding_path"
 	fi
 
@@ -113,7 +113,7 @@ function mkdir_n_chown {
 
 	local __dir_owner="$1"
 
-	if [[ "$__dir_owner" == 'root' ]] || [[ "$__dir_owner" == 'portage' ]]; then
+	if [[ "$__dir_owner" == 'root' || "$__dir_owner" == 'portage' ]]; then
 		echo
 		
 		set -x
@@ -131,11 +131,11 @@ function cp_n_chown {
 	local __file_owner="$1"
 	local __filename="$2"
 	
-	if [[ -z "$__filename" ]] || [[ "$__filename" =~ [\/] ]] || [[ "$__filename" =~ [[:space:]] ]]; then
+	if [[ -z "$__filename" || "$__filename" =~ [\/] || "$__filename" =~ [[:space:]] ]]; then
 		exit_err_1 'Wrong __filename '"$__filename"
 	fi
 
-	if [[ "$__file_owner" == 'root' ]] || [[ "$__file_owner" == 'portage' ]]; then
+	if [[ "$__file_owner" == 'root' || "$__file_owner" == 'portage' ]]; then
 		set -x
 		cp "${HG_REPO_DIR}${_active_path}"'/'"$__filename" "${OVERLAY_DIR}${_active_path}"'/'
 		chown "$__file_owner":"$__file_owner" "${OVERLAY_DIR}${_active_path}"'/'"$__filename"
@@ -157,7 +157,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
 		read USER_CHOICE
 		
-		if [[ "$USER_CHOICE" == 'y' ]] || [[ "$USER_CHOICE" == 'Y' ]]; then
+		if [[ "$USER_CHOICE" == 'y' || "$USER_CHOICE" == 'Y' ]]; then
 			echo
 			set -x
 			rm -r "$OVERLAY_DIR"
@@ -224,7 +224,7 @@ function handle_tree_files {
 		local __find_filename=$(basename "$__find_file")
 		echo
 		
-		if [[ -n "$__no_tree_check" ]] && [[ "$__no_tree_check" == 'no_check' ]]; then
+		if [[ -n "$__no_tree_check" && "$__no_tree_check" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "$__find_filename" "${_active_files[@]}")
 			
 			cp_n_chown 'root' "$__find_filename"
@@ -312,7 +312,7 @@ function main {
 		add_to_my_active_path "$__category_name"
 		mkdir_n_chown 'portage'
 		
-		if [[ "$__category_name" == 'metadata' ]] || [[ "$__category_name" == 'profiles' ]] || [[ "$__category_name" == 'eclass' ]]; then
+		if [[ "$__category_name" == 'metadata' || "$__category_name" == 'profiles' || "$__category_name" == 'eclass' ]]; then
 			handle_service_files "$__category_name"
 		elif [[ "$__category_name" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
