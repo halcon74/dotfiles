@@ -154,7 +154,7 @@ function handle_overlay_dir {
    '"$OVERLAY_DIR"'
 (y/n)
 If you choose '"'"'n'"'"', the script will be interrupted'
-
+		local USER_CHOICE
 		read USER_CHOICE
 		
 		if [[ "$USER_CHOICE" == 'y' ]] || [[ "$USER_CHOICE" == 'Y' ]]; then
@@ -181,6 +181,7 @@ function handle_service_files {
 	
 	local FIND_FILES=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
+	local FIND_FILE
 	for FIND_FILE in $(echo "$FIND_FILES"); do
 		local FIND_FILENAME=$(basename "$FIND_FILE")
 		echo
@@ -218,6 +219,7 @@ function handle_tree_files {
 	
 	local FIND_FILES=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
+	local FIND_FILE
 	for FIND_FILE in $(echo "$FIND_FILES"); do
 		local FIND_FILENAME=$(basename "$FIND_FILE")
 		echo
@@ -253,6 +255,7 @@ function handle_folders {
 	
 	local FIND_FOLDERS=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	
+	local FIND_FOLDER
 	for FIND_FOLDER in $(echo "$FIND_FOLDERS"); do
 		local FIND_FOLDERNAME=$(basename "$FIND_FOLDER")
 		
@@ -262,6 +265,7 @@ function handle_folders {
 		
 		local FIND_SUBFOLDERS=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 		
+		local FIND_SUBFOLDER
 		for FIND_SUBFOLDER in $(echo "$FIND_SUBFOLDERS"); do
 			local FIND_SUBFOLDERNAME=$(basename "$FIND_SUBFOLDER")
 			echo
@@ -299,6 +303,7 @@ function main {
 
 	handle_overlay_dir
 
+	local MY_CATEGORY
 	for MY_CATEGORY in $(echo "$_categories"); do	
 		local __category_name=$(basename "$MY_CATEGORY")
 		echo
