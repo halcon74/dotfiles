@@ -64,42 +64,42 @@ _categories=$(find "$HG_REPO_DIR" -maxdepth 1 -mindepth 1 -type d | grep -v '\.h
 # No multi-dimensional arrays in bash...
 function set_my_active_files {
 
-	local FILE_TYPE="$1"
-	local IS_PORTAGE="$2"
+	local __file_type="$1"
+	local __is_portage="$2"
 
-	if [[ "$FILE_TYPE" == 'metadata' ]]; then
-		if [[ $IS_PORTAGE -eq 1 ]]; then
+	if [[ "$__file_type" == 'metadata' ]]; then
+		if [[ $__is_portage -eq 1 ]]; then
 			_active_files="${_metadata_portage_files[@]}"
 		else
 			_active_files="${_metadata_files[@]}"
 		fi
-	elif [[ "$FILE_TYPE" == 'profiles' ]]; then
-		if [[ $IS_PORTAGE -eq 1 ]]; then
+	elif [[ "$__file_type" == 'profiles' ]]; then
+		if [[ $__is_portage -eq 1 ]]; then
 			_active_files="${_profile_portage_files[@]}"
 		else
 			_active_files="${_profile_files[@]}"
 		fi
-	elif [[ "$FILE_TYPE" == 'tree' ]]; then
-		if [[ $IS_PORTAGE -eq 1 ]]; then
+	elif [[ "$__file_type" == 'tree' ]]; then
+		if [[ $__is_portage -eq 1 ]]; then
 			_active_files="${_tree_portage_files[@]}"
 		else
 			_active_files="${_tree_files[@]}"
 		fi
 	else
-		exit_err_1 'Wrong FILE_TYPE '"$FILE_TYPE"
+		exit_err_1 'Wrong __file_type '"$__file_type"
 	fi
 
 }
 
 function add_to_my_active_path {
 
-	local ADDING_PATH="$1"
+	local __adding_path="$1"
 	
-	if [[ -z "$ADDING_PATH" ]] || [[ "$ADDING_PATH" =~ [\/] ]] || [[ "$ADDING_PATH" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong ADDING_PATH '"$ADDING_PATH"
+	if [[ -z "$__adding_path" ]] || [[ "$__adding_path" =~ [\/] ]] || [[ "$__adding_path" =~ [[:space:]] ]]; then
+		exit_err_1 'Wrong __adding_path '"$__adding_path"
 	fi
 
-	_active_path+='/'"$ADDING_PATH"
+	_active_path+='/'"$__adding_path"
 
 }
 
@@ -111,37 +111,37 @@ function clear_my_active_path {
 
 function mkdir_n_chown {
 
-	local DIR_OWNER="$1"
+	local __dir_owner="$1"
 
-	if [[ "$DIR_OWNER" == 'root' ]] || [[ "$DIR_OWNER" == 'portage' ]]; then
+	if [[ "$__dir_owner" == 'root' ]] || [[ "$__dir_owner" == 'portage' ]]; then
 		echo
 		
 		set -x
 		mkdir -p "${OVERLAY_DIR}${_active_path}"
-		chown "$DIR_OWNER":"$DIR_OWNER" "${OVERLAY_DIR}${_active_path}"
+		chown "$__dir_owner":"$__dir_owner" "${OVERLAY_DIR}${_active_path}"
 		set +x
 	else
-		exit_err_1 'Wrong DIR_OWNER '"$DIR_OWNER"
+		exit_err_1 'Wrong __dir_owner '"$__dir_owner"
 	fi
 
 }
 
 function cp_n_chown {
 
-	local FILE_OWNER="$1"
-	local FILENAME="$2"
+	local __file_owner="$1"
+	local __filename="$2"
 	
-	if [[ -z "$FILENAME" ]] || [[ "$FILENAME" =~ [\/] ]] || [[ "$FILENAME" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong FILENAME '"$FILENAME"
+	if [[ -z "$__filename" ]] || [[ "$__filename" =~ [\/] ]] || [[ "$__filename" =~ [[:space:]] ]]; then
+		exit_err_1 'Wrong __filename '"$__filename"
 	fi
 
-	if [[ "$FILE_OWNER" == 'root' ]] || [[ "$FILE_OWNER" == 'portage' ]]; then
+	if [[ "$__file_owner" == 'root' ]] || [[ "$__file_owner" == 'portage' ]]; then
 		set -x
-		cp "${HG_REPO_DIR}${_active_path}"'/'"$FILENAME" "${OVERLAY_DIR}${_active_path}"'/'
-		chown "$FILE_OWNER":"$FILE_OWNER" "${OVERLAY_DIR}${_active_path}"'/'"$FILENAME"
+		cp "${HG_REPO_DIR}${_active_path}"'/'"$__filename" "${OVERLAY_DIR}${_active_path}"'/'
+		chown "$__file_owner":"$__file_owner" "${OVERLAY_DIR}${_active_path}"'/'"$__filename"
 		set +x
 	else
-		exit_err_1 'Wrong FILE_OWNER '"$FILE_OWNER"
+		exit_err_1 'Wrong __file_owner '"$__file_owner"
 	fi
 
 }
@@ -177,7 +177,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_service_files {
 
-	local CATEGORY_NAME="$1"
+	local __category_name="$1"
 	
 	local FIND_FILES=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
@@ -185,18 +185,18 @@ function handle_service_files {
 		local FIND_FILENAME=$(basename "$FIND_FILE")
 		echo
 		
-		if [[ "$CATEGORY_NAME" == 'eclass' ]]; then
+		if [[ "$__category_name" == 'eclass' ]]; then
 			if [[ "$FIND_FILENAME" =~ ^.+\.eclass$ ]]; then
 				cp_n_chown 'portage' "$FIND_FILENAME"
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"$FIND_FILENAME"
 			fi
 		else
-			set_my_active_files "$CATEGORY_NAME" 0
+			set_my_active_files "$__category_name" 0
 			local FOUND_IN_MY_FILES=$(find_in_array "$FIND_FILENAME" "${_active_files[@]}")
 			
 			if [[ $FOUND_IN_MY_FILES -eq 1 ]]; then
-				set_my_active_files "$CATEGORY_NAME" 1
+				set_my_active_files "$__category_name" 1
 				local FOUND_IN_MY_PORTAGE_FILES=$(find_in_array "$FIND_FILENAME" "${_active_files[@]}")
 				
 				if [[ $FOUND_IN_MY_PORTAGE_FILES -eq 1 ]]; then
@@ -300,19 +300,19 @@ function main {
 	handle_overlay_dir
 
 	for MY_CATEGORY in $(echo "$_categories"); do	
-		local CATEGORY_NAME=$(basename "$MY_CATEGORY")
+		local __category_name=$(basename "$MY_CATEGORY")
 		echo
 		
 		clear_my_active_path
-		add_to_my_active_path "$CATEGORY_NAME"
+		add_to_my_active_path "$__category_name"
 		mkdir_n_chown 'portage'
 		
-		if [[ "$CATEGORY_NAME" == 'metadata' ]] || [[ "$CATEGORY_NAME" == 'profiles' ]] || [[ "$CATEGORY_NAME" == 'eclass' ]]; then
-			handle_service_files "$CATEGORY_NAME"
-		elif [[ "$CATEGORY_NAME" =~ ^[^\-]+\-[^\-]+$ ]]; then
+		if [[ "$__category_name" == 'metadata' ]] || [[ "$__category_name" == 'profiles' ]] || [[ "$__category_name" == 'eclass' ]]; then
+			handle_service_files "$__category_name"
+		elif [[ "$__category_name" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
 		else
-			exit_err_1 'Wrong category: '"$CATEGORY_NAME"
+			exit_err_1 'Wrong category: '"$__category_name"
 		fi
 	done
 	
