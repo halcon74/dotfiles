@@ -25,21 +25,21 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-OVERLAY_DIR=$(read_from_conffile 'OVERLAY_DIR' "$_conf_file")
-HG_REPO_DIR=$(read_from_conffile 'HG_REPO_DIR' "$_conf_file")
+OVERLAY_DIR=$(read_from_conffile 'OVERLAY_DIR' "${_conf_file}")
+HG_REPO_DIR=$(read_from_conffile 'HG_REPO_DIR' "${_conf_file}")
 
-if [[ -z "$OVERLAY_DIR" ]]; then
+if [[ -z "${OVERLAY_DIR}" ]]; then
 	exit_err_1 'OVERLAY_DIR is not set'
 fi
-if [[ -z "$HG_REPO_DIR" ]]; then
+if [[ -z "${HG_REPO_DIR}" ]]; then
 	exit_err_1 'HG_REPO_DIR is not set'
 fi
 
-if [[ ! -d "$OVERLAY_DIR" ]]; then
-	exit_err_1 'OVERLAY_DIR='"$OVERLAY_DIR"': No such diectory'
+if [[ ! -d "${OVERLAY_DIR}" ]]; then
+	exit_err_1 'OVERLAY_DIR='"${OVERLAY_DIR}"': No such diectory'
 fi
-if [[ ! -d "$HG_REPO_DIR" ]]; then
-	exit_err_1 'HG_REPO_DIR='"$HG_REPO_DIR"': No such diectory'
+if [[ ! -d "${HG_REPO_DIR}" ]]; then
+	exit_err_1 'HG_REPO_DIR='"${HG_REPO_DIR}"': No such diectory'
 fi
 
 _metadata_files=('layout.conf')
@@ -59,47 +59,47 @@ _subfolders=('files')
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_categories=$(find "$HG_REPO_DIR" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
+_categories=$(find "${HG_REPO_DIR}" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
 
 # No multi-dimensional arrays in bash...
 function set_my_active_files {
 
-	local __file_type="$1"
-	local __is_portage="$2"
+	local __file_type="${1}"
+	local __is_portage="${2}"
 
-	if [[ "$__file_type" == 'metadata' ]]; then
-		if [[ $__is_portage -eq 1 ]]; then
+	if [[ "${__file_type}" == 'metadata' ]]; then
+		if [[ ${__is_portage} -eq 1 ]]; then
 			_active_files="${_metadata_portage_files[@]}"
 		else
 			_active_files="${_metadata_files[@]}"
 		fi
-	elif [[ "$__file_type" == 'profiles' ]]; then
-		if [[ $__is_portage -eq 1 ]]; then
+	elif [[ "${__file_type}" == 'profiles' ]]; then
+		if [[ ${__is_portage} -eq 1 ]]; then
 			_active_files="${_profile_portage_files[@]}"
 		else
 			_active_files="${_profile_files[@]}"
 		fi
-	elif [[ "$__file_type" == 'tree' ]]; then
-		if [[ $__is_portage -eq 1 ]]; then
+	elif [[ "${__file_type}" == 'tree' ]]; then
+		if [[ ${__is_portage} -eq 1 ]]; then
 			_active_files="${_tree_portage_files[@]}"
 		else
 			_active_files="${_tree_files[@]}"
 		fi
 	else
-		exit_err_1 'Wrong __file_type '"$__file_type"
+		exit_err_1 'Wrong __file_type '"${__file_type}"
 	fi
 
 }
 
 function add_to_my_active_path {
 
-	local __adding_path="$1"
+	local __adding_path="${1}"
 	
-	if [[ -z "$__adding_path" || "$__adding_path" =~ [\/] || "$__adding_path" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __adding_path '"$__adding_path"
+	if [[ -z "${__adding_path}" || "${__adding_path}" =~ [\/] || "${__adding_path}" =~ [[:space:]] ]]; then
+		exit_err_1 'Wrong __adding_path '"${__adding_path}"
 	fi
 
-	_active_path+='/'"$__adding_path"
+	_active_path+='/'"${__adding_path}"
 
 }
 
@@ -111,37 +111,37 @@ function clear_my_active_path {
 
 function mkdir_n_chown {
 
-	local __dir_owner="$1"
+	local __dir_owner="${1}"
 
-	if [[ "$__dir_owner" == 'root' || "$__dir_owner" == 'portage' ]]; then
+	if [[ "${__dir_owner}" == 'root' || "${__dir_owner}" == 'portage' ]]; then
 		echo
 		
 		set -x
 		mkdir -p "${OVERLAY_DIR}${_active_path}"
-		chown "$__dir_owner":"$__dir_owner" "${OVERLAY_DIR}${_active_path}"
+		chown "${__dir_owner}":"${__dir_owner}" "${OVERLAY_DIR}${_active_path}"
 		set +x
 	else
-		exit_err_1 'Wrong __dir_owner '"$__dir_owner"
+		exit_err_1 'Wrong __dir_owner '"${__dir_owner}"
 	fi
 
 }
 
 function cp_n_chown {
 
-	local __file_owner="$1"
-	local __filename="$2"
+	local __file_owner="${1}"
+	local __filename="${2}"
 	
-	if [[ -z "$__filename" || "$__filename" =~ [\/] || "$__filename" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __filename '"$__filename"
+	if [[ -z "${__filename}" || "${__filename}" =~ [\/] || "${__filename}" =~ [[:space:]] ]]; then
+		exit_err_1 'Wrong __filename '"${__filename}"
 	fi
 
-	if [[ "$__file_owner" == 'root' || "$__file_owner" == 'portage' ]]; then
+	if [[ "${__file_owner}" == 'root' || "${__file_owner}" == 'portage' ]]; then
 		set -x
-		cp "${HG_REPO_DIR}${_active_path}"'/'"$__filename" "${OVERLAY_DIR}${_active_path}"'/'
-		chown "$__file_owner":"$__file_owner" "${OVERLAY_DIR}${_active_path}"'/'"$__filename"
+		cp "${HG_REPO_DIR}${_active_path}"'/'"${__filename}" "${OVERLAY_DIR}${_active_path}"'/'
+		chown "${__file_owner}":"${__file_owner}" "${OVERLAY_DIR}${_active_path}"'/'"${__filename}"
 		set +x
 	else
-		exit_err_1 'Wrong __file_owner '"$__file_owner"
+		exit_err_1 'Wrong __file_owner '"${__file_owner}"
 	fi
 
 }
