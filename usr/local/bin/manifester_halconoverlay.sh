@@ -2,7 +2,7 @@
 
 # Manifester script for halcon-overlay
 # Regenerating manifests and synchronizing a Gentoo overlay in a location, owned by root and portage, with a hg (Mercurial) repository, owned by user
-# Should be called by root (got by user with `su`, in a terminal/console opened by user)
+# Should be called by root (got by user with `su`, in a terminal/console opened by user, see _user_name)
 #
 # Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
 #
