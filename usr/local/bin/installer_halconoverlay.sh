@@ -17,8 +17,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# along with this program; If not, see <https://www.gnu.org/licenses/>.
 
 source /usr/local/bin/mclass_utilities.sh
 
@@ -192,6 +191,8 @@ function handle_service_files {
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
 			fi
+		elif [[ "${__category_name}" == 'licenses' ]]; then
+				cp_n_chown 'portage' "${__find_filename}"
 		else
 			set_my_active_files "${__category_name}" 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -312,7 +313,7 @@ function main {
 		add_to_my_active_path "${__category_name}"
 		mkdir_n_chown 'portage'
 		
-		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' ]]; then
+		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' || "${__category_name}" == 'licenses' ]]; then
 			handle_service_files "${__category_name}"
 		elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
