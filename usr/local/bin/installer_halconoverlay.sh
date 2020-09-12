@@ -41,6 +41,9 @@ if [[ ! -d "${HG_REPO_DIR}" ]]; then
 	exit_err_1 'HG_REPO_DIR='"${HG_REPO_DIR}"': No such diectory'
 fi
 
+_overlay_files=('overlay.xml' 'README.md')
+_overlay_portage_files=()
+
 _metadata_files=('layout.conf')
 _metadata_portage_files=()
 
@@ -71,6 +74,12 @@ function set_my_active_files {
 			_active_files="${_metadata_portage_files[@]}"
 		else
 			_active_files="${_metadata_files[@]}"
+		fi
+	elif [[ "${__file_type}" == 'overlay' ]]; then
+		if [[ ${__is_portage} -eq 1 ]]; then
+			_active_files="${_overlay_portage_files[@]}"
+		else
+			_active_files="${_overlay_files[@]}"
 		fi
 	elif [[ "${__file_type}" == 'profiles' ]]; then
 		if [[ ${__is_portage} -eq 1 ]]; then
@@ -160,6 +169,8 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 			echo
 			set -x
 			rm -r "${OVERLAY_DIR}"
+			mkdir -p "${OVERLAY_DIR}"
+			chown root:root "${OVERLAY_DIR}"
 			set +x
 		else
 			echo
@@ -171,6 +182,27 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		chown root:root "${OVERLAY_DIR}"
 		set +x
 	fi
+
+}
+
+function handle_overlay_files {
+
+	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hgignore' |sort)
+	
+	local __find_file
+	for __find_file in $(echo "${__find_files}"); do
+		local __find_filename="${__find_file##*/}"
+		echo
+		
+		set_my_active_files "overlay" 0
+		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
+		if [[ ${__find_in_my_files} -eq 1 ]]; then
+			cp_n_chown 'portage' "${__find_filename}"
+		else
+			exit_err_1 'Wrong overlay file '"${_active_path}"'/'"${__find_filename}"
+		fi
+		
+	done
 
 }
 
@@ -303,6 +335,7 @@ function check_diff {
 function main {
 
 	handle_overlay_dir
+	handle_overlay_files
 
 	local __my_category
 	for __my_category in $(echo "${_categories}"); do	
