@@ -333,27 +333,33 @@ function check_diff {
 
 }
 
-handle_HALCONOVERLAY_DIR
-handle_overlay_files
+function main {
 
-local __my_category
-for __my_category in $(echo "${_categories}"); do	
-	local __category_name="${__my_category##*/}"
-	echo
-	
-	clear_my_active_path
-	add_to_my_active_path "${__category_name}"
-	mkdir_n_chown 'portage'
-	
-	if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' || "${__category_name}" == 'licenses' ]]; then
-		handle_service_files "${__category_name}"
-	elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
-		handle_folders
-	else
-		exit_err_1 'Wrong category: '"${__category_name}"
-	fi
-done
+	handle_HALCONOVERLAY_DIR
+	handle_overlay_files
 
-check_diff
+	local __my_category
+	for __my_category in $(echo "${_categories}"); do	
+		local __category_name="${__my_category##*/}"
+		echo
+		
+		clear_my_active_path
+		add_to_my_active_path "${__category_name}"
+		mkdir_n_chown 'portage'
+		
+		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' || "${__category_name}" == 'licenses' ]]; then
+			handle_service_files "${__category_name}"
+		elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
+			handle_folders
+		else
+			exit_err_1 'Wrong category: '"${__category_name}"
+		fi
+	done
+	
+	check_diff
+
+}
+
+main
 	
 exit 0
