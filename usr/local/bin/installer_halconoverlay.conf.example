@@ -1,4 +1,4 @@
-# Comments are supported:
-# OVERLAY_DIR=/non/existing
-OVERLAY_DIR=/var/db/repos/localrepo
-HG_REPO_DIR=/home/user/myPrograms/myOverlay
+# All variables may be set as Environment Variables (in /root/.bashrc)
+# The values of Environment Variables are used only if the corresponding values in this file are not set or are empty
+HALCONOVERLAY_DIR=/var/db/repos/localrepo
+HALCONHG_DIR=/home/user/myPrograms/myOverlay
