@@ -24,8 +24,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-OVERLAY_DIR=$(read_from_conffile 'OVERLAY_DIR' "${_conf_file}")
-HG_REPO_DIR=$(read_from_conffile 'HG_REPO_DIR' "${_conf_file}")
+OVERLAY_DIR=$(read_env_or_conf_var 'OVERLAY_DIR' "${_conf_file}")
+HG_REPO_DIR=$(read_env_or_conf_var 'HG_REPO_DIR' "${_conf_file}")
 
 if [[ -z "${OVERLAY_DIR}" ]]; then
 	exit_err_1 'OVERLAY_DIR is not set'
