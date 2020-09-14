@@ -121,24 +121,18 @@ function handle_folders {
 
 }
 
-function main {
-
-	local __my_category
-	for __my_category in $(echo "${_categories}"); do	
-		local __category_name="${__my_category##*/}"
+local __my_category
+for __my_category in $(echo "${_categories}"); do	
+	local __category_name="${__my_category##*/}"
+	
+	clear_my_active_path
+	add_to_my_active_path "${__category_name}"
+	
+	if [[ "${__category_name}" != 'metadata' && "${__category_name}" != 'profiles' && "${__category_name}" != 'eclass' && "${__category_name}" != 'licenses' ]]; then
+		echo
 		
-		clear_my_active_path
-		add_to_my_active_path "${__category_name}"
-		
-		if [[ "${__category_name}" != 'metadata' && "${__category_name}" != 'profiles' && "${__category_name}" != 'eclass' && "${__category_name}" != 'licenses' ]]; then
-			echo
-			
-			handle_folders
-		fi
-	done
-
-}
-
-main
+		handle_folders
+	fi
+done
 	
 exit 0
