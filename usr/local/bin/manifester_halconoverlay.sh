@@ -24,21 +24,21 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-OVERLAY_DIR=$(read_env_or_conf_var 'OVERLAY_DIR' "${_conf_file}")
-HG_REPO_DIR=$(read_env_or_conf_var 'HG_REPO_DIR' "${_conf_file}")
+HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}")
+HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
 
-if [[ -z "${OVERLAY_DIR}" ]]; then
-	exit_err_1 'OVERLAY_DIR is not set'
+if [[ -z "${HALCONOVERLAY_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_DIR is not set'
 fi
-if [[ -z "${HG_REPO_DIR}" ]]; then
-	exit_err_1 'HG_REPO_DIR is not set'
+if [[ -z "${HALCONHG_DIR}" ]]; then
+	exit_err_1 'HALCONHG_DIR is not set'
 fi
 
-if [[ ! -d "${OVERLAY_DIR}" ]]; then
-	exit_err_1 'OVERLAY_DIR='"${OVERLAY_DIR}"': No such diectory'
+if [[ ! -d "${HALCONOVERLAY_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_DIR='"${HALCONOVERLAY_DIR}"': No such diectory'
 fi
-if [[ ! -d "${HG_REPO_DIR}" ]]; then
-	exit_err_1 'HG_REPO_DIR='"${HG_REPO_DIR}"': No such diectory'
+if [[ ! -d "${HALCONHG_DIR}" ]]; then
+	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such diectory'
 fi
 
 _user_name=$(ls -l `tty` | awk '{print $3}')
@@ -46,7 +46,7 @@ _user_name=$(ls -l `tty` | awk '{print $3}')
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_categories=$(find "${OVERLAY_DIR}" -maxdepth 1 -mindepth 1 -type d | sort)
+_categories=$(find "${HALCONOVERLAY_DIR}" -maxdepth 1 -mindepth 1 -type d | sort)
 
 function add_to_my_active_path {
 
@@ -76,21 +76,21 @@ function cp_n_chown {
 	fi
 
 	set -x
-	cp "${OVERLAY_DIR}${_active_path}"'/'"${__filename}" "${HG_REPO_DIR}${_active_path}"'/'
-	chown "${__file_owner}":"${__file_owner}" "${HG_REPO_DIR}${_active_path}"'/'"${__filename}"
+	cp "${HALCONOVERLAY_DIR}${_active_path}"'/'"${__filename}" "${HALCONHG_DIR}${_active_path}"'/'
+	chown "${__file_owner}":"${__file_owner}" "${HALCONHG_DIR}${_active_path}"'/'"${__filename}"
 	set +x
 
 }
 
 function handle_manifests {
 	
-	local __manifest_file="${OVERLAY_DIR}${_active_path}"'/Manifest'
+	local __manifest_file="${HALCONOVERLAY_DIR}${_active_path}"'/Manifest'
 	
 	set -x
 	rm "${__manifest_file}"
 	set +x
 	
-	local __find_files=$(find "${OVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${HALCONOVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -108,7 +108,7 @@ function handle_manifests {
 
 function handle_folders {
 	
-	local __find_folders=$(find "${OVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+	local __find_folders=$(find "${HALCONOVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
