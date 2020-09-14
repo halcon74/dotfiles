@@ -155,7 +155,7 @@ function cp_n_chown {
 
 }
 
-function handle_HALCONOVERLAY_DIR {
+function handle_overlay_dir {
 
 	if [[ -d "${HALCONOVERLAY_DIR}" ]]; then
 		echo
@@ -335,7 +335,7 @@ function check_diff {
 
 function main {
 
-	handle_HALCONOVERLAY_DIR
+	handle_overlay_dir
 	handle_overlay_files
 
 	local __my_category
