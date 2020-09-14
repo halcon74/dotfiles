@@ -18,32 +18,33 @@
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
 # calling example: 
-# FOUND_IN_SCRIPTS=$(find_in_array "$FILENAME" "${MY_SCRIPTS[@]}")
+# local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 function find_in_array {
 	
-	local ARG_VALUE="$1"
+	local __arg_value="${1}"
 	shift
-	local ARG_ARRAY=("$@")
+	local __arg_array=("$@")
 	
-	local FOUND=0
-	for EACH in ${ARG_ARRAY[@]}; do
-		if [[ "$ARG_VALUE" == "$EACH" ]]; then
-			FOUND=1
+	local __found=0
+	local __each
+	for __each in ${__arg_array[@]}; do
+		if [[ "${__arg_value}" == "${__each}" ]]; then
+			__found=1
 			break
 		fi
 	done
 	
-	echo $FOUND
+	echo ${__found}
 
 }
 
 # calling example: 
-# exit_err_1 'Wrong category: '"$CATEGORY_NAME"
+# exit_err_1 'Wrong category: '"${__category_name}"
 function exit_err_1 {
 	
-	local ARG_ERROR="$1"
+	local __arg_error="${1}"
 
-	echo "$ARG_ERROR"'.
+	echo "${__arg_error}"'.
 
 Exiting 1.'
 	exit 1
@@ -51,15 +52,19 @@ Exiting 1.'
 }
 
 # calling example: 
-# MY_OVERLAY_DIR=$(read_from_conffile 'MY_OVERLAY_DIR' "$MY_CONFFILE")
-function read_from_conffile {
+# HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
+function read_env_or_conf_var {
 
-	local THE_NAME="$1"
-	local THE_CONFFILE="$2"
+	local __the_name="${1}"
+	local __the_conffile="${2}"
 	
-	local THE_VALUE=$(grep "$THE_NAME" "$THE_CONFFILE" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"$THE_NAME"'=(.+)$/\1/')
+	local __the_value=$(grep "${__the_name}" "${__the_conffile}" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"${__the_name}"'=(.+)$/\1/')
 	
-	echo "$THE_VALUE"
+	if [[ -z "${__the_value}" ]]; then
+		__the_value=${!__the_name}
+	fi
+	
+	echo "${__the_value}"
 
 }
 
