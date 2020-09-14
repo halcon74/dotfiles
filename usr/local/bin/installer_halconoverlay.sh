@@ -2,6 +2,7 @@
 
 # Installer script for halcon-overlay
 # Synchronizing a Gentoo overlay in a hg (Mercurial) repository, owned by user, with another location, owned by root and portage
+# Checking that files/folders names are permitted in the overlay
 # Should be called by root
 #
 # Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
