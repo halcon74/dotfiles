@@ -24,21 +24,21 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-OVERLAY_DIR=$(read_from_conffile 'OVERLAY_DIR' "${_conf_file}")
-HG_REPO_DIR=$(read_from_conffile 'HG_REPO_DIR' "${_conf_file}")
+HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}")
+HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
 
-if [[ -z "${OVERLAY_DIR}" ]]; then
-	exit_err_1 'OVERLAY_DIR is not set'
+if [[ -z "${HALCONOVERLAY_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_DIR is not set'
 fi
-if [[ -z "${HG_REPO_DIR}" ]]; then
-	exit_err_1 'HG_REPO_DIR is not set'
+if [[ -z "${HALCONHG_DIR}" ]]; then
+	exit_err_1 'HALCONHG_DIR is not set'
 fi
 
-if [[ ! -d "${OVERLAY_DIR}" ]]; then
-	exit_err_1 'OVERLAY_DIR='"${OVERLAY_DIR}"': No such diectory'
+if [[ ! -d "${HALCONOVERLAY_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_DIR='"${HALCONOVERLAY_DIR}"': No such directory'
 fi
-if [[ ! -d "${HG_REPO_DIR}" ]]; then
-	exit_err_1 'HG_REPO_DIR='"${HG_REPO_DIR}"': No such diectory'
+if [[ ! -d "${HALCONHG_DIR}" ]]; then
+	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such directory'
 fi
 
 _overlay_files=('overlay.xml' 'README.md')
@@ -61,7 +61,7 @@ _subfolders=('files')
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_categories=$(find "${HG_REPO_DIR}" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
+_categories=$(find "${HALCONHG_DIR}" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
 
 # No multi-dimensional arrays in bash...
 function set_my_active_files {
@@ -125,8 +125,8 @@ function mkdir_n_chown {
 		echo
 		
 		set -x
-		mkdir -p "${OVERLAY_DIR}${_active_path}"
-		chown "${__dir_owner}":"${__dir_owner}" "${OVERLAY_DIR}${_active_path}"
+		mkdir -p "${HALCONOVERLAY_DIR}${_active_path}"
+		chown "${__dir_owner}":"${__dir_owner}" "${HALCONOVERLAY_DIR}${_active_path}"
 		set +x
 	else
 		exit_err_1 'Wrong __dir_owner '"${__dir_owner}"
@@ -145,8 +145,8 @@ function cp_n_chown {
 
 	if [[ "${__file_owner}" == 'root' || "${__file_owner}" == 'portage' ]]; then
 		set -x
-		cp "${HG_REPO_DIR}${_active_path}"'/'"${__filename}" "${OVERLAY_DIR}${_active_path}"'/'
-		chown "${__file_owner}":"${__file_owner}" "${OVERLAY_DIR}${_active_path}"'/'"${__filename}"
+		cp "${HALCONHG_DIR}${_active_path}"'/'"${__filename}" "${HALCONOVERLAY_DIR}${_active_path}"'/'
+		chown "${__file_owner}":"${__file_owner}" "${HALCONOVERLAY_DIR}${_active_path}"'/'"${__filename}"
 		set +x
 	else
 		exit_err_1 'Wrong __file_owner '"${__file_owner}"
@@ -154,12 +154,12 @@ function cp_n_chown {
 
 }
 
-function handle_overlay_dir {
+function handle_HALCONOVERLAY_DIR {
 
-	if [[ -d "${OVERLAY_DIR}" ]]; then
+	if [[ -d "${HALCONOVERLAY_DIR}" ]]; then
 		echo
 		echo 'ATTENTION! Delete this directory?
-   '"${OVERLAY_DIR}"'
+   '"${HALCONOVERLAY_DIR}"'
 (y/n)
 If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
@@ -168,9 +168,9 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		if [[ "${USER_CHOICE}" == 'y' || "${USER_CHOICE}" == 'Y' ]]; then
 			echo
 			set -x
-			rm -r "${OVERLAY_DIR}"
-			mkdir -p "${OVERLAY_DIR}"
-			chown root:root "${OVERLAY_DIR}"
+			rm -r "${HALCONOVERLAY_DIR}"
+			mkdir -p "${HALCONOVERLAY_DIR}"
+			chown root:root "${HALCONOVERLAY_DIR}"
 			set +x
 		else
 			echo
@@ -178,8 +178,8 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		fi
 	else
 		set -x
-		mkdir -p "${OVERLAY_DIR}"
-		chown root:root "${OVERLAY_DIR}"
+		mkdir -p "${HALCONOVERLAY_DIR}"
+		chown root:root "${HALCONOVERLAY_DIR}"
 		set +x
 	fi
 
@@ -187,7 +187,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_overlay_files {
 
-	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hgignore' |sort)
+	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hgignore' |sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -210,7 +210,7 @@ function handle_service_files {
 
 	local __category_name="${1}"
 	
-	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -250,7 +250,7 @@ function handle_tree_files {
 
 	local __no_tree_check="${1}"
 	
-	local __find_files=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -286,7 +286,7 @@ function handle_tree_files {
 
 function handle_folders {
 	
-	local __find_folders=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+	local __find_folders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
@@ -296,7 +296,7 @@ function handle_folders {
 		mkdir_n_chown 'portage'
 		handle_tree_files ''
 		
-		local __find_subfolders=$(find "${HG_REPO_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+		local __find_subfolders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 		
 		local __find_subfolder
 		for __find_subfolder in $(echo "${__find_subfolders}"); do
@@ -323,7 +323,7 @@ function check_diff {
 	echo
 	echo
 
-	local __diff_ur=$(diff -ur "${HG_REPO_DIR}" "${OVERLAY_DIR}" | grep -v ': \.hg')
+	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_DIR}" | grep -v ': \.hg')
 	
 	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 
@@ -334,7 +334,7 @@ function check_diff {
 
 function main {
 
-	handle_overlay_dir
+	handle_HALCONOVERLAY_DIR
 	handle_overlay_files
 
 	local __my_category
