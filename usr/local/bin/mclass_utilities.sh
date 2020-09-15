@@ -66,7 +66,7 @@ function cp_n_chown_n_chmod {
 	chown --verbose "${__file_owners}" "${__new_full_path}"
 	
 	# chmod
-	chmod "${__file_mask}" "${__new_full_path}"
+	chmod --verbose "${__file_mask}" "${__new_full_path}"
 
 }
 
