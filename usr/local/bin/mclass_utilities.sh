@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
+# In the alphabet order:
+
 # calling example: 
 # cp_n_chown_n_chmod "${$FILENAME}" 'root:'"${_user_name}" 750 '/usr/local/bin/'
 function cp_n_chown_n_chmod {
