@@ -4,6 +4,8 @@
 # Regenerating manifests and synchronizing a Gentoo overlay in a location, owned by root and portage, with a hg (Mercurial) repository, owned by user
 # Should be called by root (got by user with `su`, in a terminal/console opened by user, see _user_name)
 #
+# The script uses the following Environment Variables: ( HALCONOVERLAY_DIR HALCONHG_DIR )
+#
 # Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
 #
 # This program is free software; you can redistribute it and/or
@@ -41,7 +43,7 @@ if [[ ! -d "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such diectory'
 fi
 
-_user_name=$(ls -l `tty` | awk '{print $3}')
+_user_name=$(get_user_name_from_tty)
 
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
@@ -66,22 +68,6 @@ function clear_my_active_path {
 
 }
 
-function cp_n_chown {
-
-	local __file_owner="${_user_name}"
-	local __filename="${1}"
-	
-	if [[ -z "${__filename}" || "${__filename}" =~ [\/] || "${__filename}" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __filename '"${__filename}"
-	fi
-
-	set -x
-	cp "${HALCONOVERLAY_DIR}${_active_path}"'/'"${__filename}" "${HALCONHG_DIR}${_active_path}"'/'
-	chown "${__file_owner}":"${__file_owner}" "${HALCONHG_DIR}${_active_path}"'/'"${__filename}"
-	set +x
-
-}
-
 function handle_manifests {
 	
 	local __manifest_file="${HALCONOVERLAY_DIR}${_active_path}"'/Manifest'
@@ -103,7 +89,10 @@ function handle_manifests {
 	done
 
 	local __manifest_filename="${__manifest_file##*/}"
-	cp_n_chown "${__manifest_filename}"
+	local __full_file_name="${HALCONOVERLAY_DIR}${_active_path}"'/'"${__manifest_filename}"
+	local __dest_dir="${HALCONHG_DIR}${_active_path}"
+	cp_n_chown_n_chmod "${__full_file_name}" "${_user_name}"':'"${_user_name}" 644 "${__dest_dir}"
+	
 }
 
 function handle_folders {
@@ -124,7 +113,7 @@ function handle_folders {
 function main {
 
 	local __my_category
-	for __my_category in $(echo "${_categories}"); do	
+	for __my_category in $(echo "${_categories}"); do
 		local __category_name="${__my_category##*/}"
 		
 		clear_my_active_path
