@@ -33,7 +33,7 @@ function cp_n_chown_n_chmod {
 		exit_err_1 'Wrong __file_name '"${__file_name}"
 	fi
 	
-	if [[ ! "${__file_owners}" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
+	if [[ -z "${__file_owners}" || ! "${__file_owners}" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
 		exit_err_1 'Wrong __file_owners '"${__file_owners}"
 	fi
 	
