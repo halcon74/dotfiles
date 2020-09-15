@@ -34,11 +34,11 @@ function cp_n_chown_n_chmod {
 	fi
 	
 	if [[ ! "${__file_owners}" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
-		exit_err_1 "Wrong __file_owners '${__file_owners}'"
+		exit_err_1 'Wrong __file_owners '"${__file_owners}"
 	fi
 	
-  if [[ ! -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
-		exit_err_1 "Wrong __file_mask '${__file_mask}'"
+	if [[ -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
+		exit_err_1 'Wrong __file_mask '"${__file_mask}"
 	fi
 	
 	if [[ ! -d "${__dest_dir}" ]]; then
@@ -72,7 +72,7 @@ function exit_err_1 {
 
 	echo "${__arg_error}"'.
 
-Exiting 1.' >&2 # or >/dev/stderr
+Exiting 1.' >&2
 	exit 1
 
 }
