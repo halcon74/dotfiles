@@ -84,7 +84,6 @@ function set_my_active_files {
 	fi
 	
 	eval _active_files=( '"${_'${__file_type}${__evaling_portage}'_files[@]}"' )
-	echo 
 
 }
 
