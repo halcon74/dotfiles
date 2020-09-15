@@ -5,6 +5,8 @@
 # Checking that files/folders names are permitted in the overlay
 # Should be called by root
 #
+# The script uses the following Environment Variables: ( HALCONOVERLAY_DIR HALCONHG_DIR )
+#
 # Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
 #
 # This program is free software; you can redistribute it and/or
@@ -48,11 +50,13 @@ _overlay_portage_files=()
 _metadata_files=('layout.conf')
 _metadata_portage_files=()
 
-_profile_files=('repo_name')
-_profile_portage_files=('repo_name')
+_profiles_files=('repo_name')
+_profiles_portage_files=('repo_name')
 
 _tree_files=('Manifest' 'metadata.xml')
 _tree_portage_files=('metadata.xml')
+
+_keys_for_active_files=('metadata' 'overlay' 'profiles' 'tree')
 
 # Set in function set_my_active_files
 _active_files=()
@@ -64,39 +68,23 @@ _active_path=''
 
 _categories=$(find "${HALCONHG_DIR}" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
 
-# No multi-dimensional arrays in bash...
 function set_my_active_files {
 
 	local __file_type="${1}"
 	local __is_portage="${2}"
-
-	if [[ "${__file_type}" == 'metadata' ]]; then
-		if [[ ${__is_portage} -eq 1 ]]; then
-			_active_files="${_metadata_portage_files[@]}"
-		else
-			_active_files="${_metadata_files[@]}"
-		fi
-	elif [[ "${__file_type}" == 'overlay' ]]; then
-		if [[ ${__is_portage} -eq 1 ]]; then
-			_active_files="${_overlay_portage_files[@]}"
-		else
-			_active_files="${_overlay_files[@]}"
-		fi
-	elif [[ "${__file_type}" == 'profiles' ]]; then
-		if [[ ${__is_portage} -eq 1 ]]; then
-			_active_files="${_profile_portage_files[@]}"
-		else
-			_active_files="${_profile_files[@]}"
-		fi
-	elif [[ "${__file_type}" == 'tree' ]]; then
-		if [[ ${__is_portage} -eq 1 ]]; then
-			_active_files="${_tree_portage_files[@]}"
-		else
-			_active_files="${_tree_files[@]}"
-		fi
-	else
+	
+	local __find_in_keys_for_active_files=$(find_in_array "${__file_type}" "${_keys_for_active_files[@]}")
+	if [[ ${__find_in_keys_for_active_files} -ne 1 ]]; then
 		exit_err_1 'Wrong __file_type '"${__file_type}"
 	fi
+	
+	local __evaling_portage=''
+	if [[ "${__is_portage}" -eq 1 ]]; then
+		__evaling_portage='_portage'
+	fi
+	
+	eval _active_files=( '"${_'${__file_type}${__evaling_portage}'_files[@]}"' )
+	echo 
 
 }
 
@@ -195,10 +183,13 @@ function handle_overlay_files {
 		local __find_filename="${__find_file##*/}"
 		echo
 		
+		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		
 		set_my_active_files "overlay" 0
 		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 		if [[ ${__find_in_my_files} -eq 1 ]]; then
-			cp_n_chown 'portage' "${__find_filename}"
+			cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 		else
 			exit_err_1 'Wrong overlay file '"${_active_path}"'/'"${__find_filename}"
 		fi
@@ -218,14 +209,17 @@ function handle_service_files {
 		local __find_filename="${__find_file##*/}"
 		echo
 		
+		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		
 		if [[ "${__category_name}" == 'eclass' ]]; then
 			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
-				cp_n_chown 'portage' "${__find_filename}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
 			fi
 		elif [[ "${__category_name}" == 'licenses' ]]; then
-				cp_n_chown 'portage' "${__find_filename}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 		else
 			set_my_active_files "${__category_name}" 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -235,9 +229,9 @@ function handle_service_files {
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 				
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
-					cp_n_chown 'portage' "${__find_filename}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 				else
-					cp_n_chown 'root' "${__find_filename}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
 				fi
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
@@ -258,10 +252,13 @@ function handle_tree_files {
 		local __find_filename="${__find_file##*/}"
 		echo
 		
+		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 			
-			cp_n_chown 'root' "${__find_filename}"
+			cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
 		else
 			set_my_active_files 'tree' 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -271,12 +268,12 @@ function handle_tree_files {
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 				
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
-					cp_n_chown 'portage' "${__find_filename}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 				else
-					cp_n_chown 'root' "${__find_filename}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
 				fi
 			elif [[ "${__find_filename}" =~ ^.+\.ebuild$ ]]; then
-				cp_n_chown 'root' "${__find_filename}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
 			else
 				exit_err_1 'Wrong tree file '"${_active_path}"'/'"${__find_filename}"
 			fi
@@ -339,7 +336,7 @@ function main {
 	handle_overlay_files
 
 	local __my_category
-	for __my_category in $(echo "${_categories}"); do	
+	for __my_category in $(echo "${_categories}"); do
 		local __category_name="${__my_category##*/}"
 		echo
 		
