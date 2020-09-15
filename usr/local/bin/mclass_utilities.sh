@@ -29,29 +29,35 @@ function cp_n_chown_n_chmod {
 	local __dest_dir="${4}"
 	local __add_dot="${5}"
 	
-	if [[ -z "${__file_name}" || "${__file_name}" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __file_name '"${__file_name}"
+	if [[ -z "${__file_name}" || "${__file_name}" =~ [:space:] ]]; then
+		exit_err_1 "Wrong __file_name ${__file_name}"
 	fi
 	
+    #????????????????????
+    #????????????????????
+    #????????????????????
+    #????????????????????
+    #????????????????????
+    #????????????????????
 	if [[ ! "${__file_owners}" =~ ^[^[:space:]]+:[^[:space:]]+$ ]]; then
-		exit_err_1 'Wrong __file_owners '"${__file_owners}"
+		exit_err_1 "Wrong __file_owners ${__file_owners}"
 	fi
 	
-	if [[ ! "${__file_mask}" =~ ^[0124][0-9][0-9][0-9]$ ]]; then
-		exit_err_1 'Wrong __file_mask '"${__file_mask}"
+	if [[ ! "${__file_mask}" =~ ^[0124][0-7][0-7][0-7]$ ]]; then
+		exit_err_1 "Wrong __file_mask ${__file_mask}"
 	fi
 	
 	if [[ ! -d "${__dest_dir}" ]]; then
-		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
+		exit_err_1 "__dest_dir='${__dest_dir}': No such directory"
 	fi
 	
 	local __base_name="${__file_name##*/}"
 	local __new_full_path
 	
 	if [[ "${__add_dot}" -eq 1 ]]; then
-		__new_full_path="${__dest_dir}"'/.'"${__base_name}"
+		__new_full_path="${__dest_dir}/.${__base_name}"
 	else
-		__new_full_path="${__dest_dir}"'/'"${__base_name}"
+		__new_full_path="${__dest_dir}/${__base_name}"
 	fi
 	
 	set -x
@@ -78,7 +84,7 @@ function exit_err_1 {
 
 	echo "${__arg_error}"'.
 
-Exiting 1.'
+Exiting 1.' >&2 # or >/dev/stderr
 	exit 1
 
 }
