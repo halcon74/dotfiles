@@ -20,7 +20,7 @@
 # In the alphabet order:
 
 # calling example: 
-# cp_n_chown_n_chmod "${$FILENAME}" 'root:'"${_user_name}" 750 '/usr/local/bin/'
+# cp_n_chown_n_chmod "${__my_script}" 'root:'"${_user_name}" 750 "${_my_dest_dir}"
 function cp_n_chown_n_chmod {
 
 	local __file_name="${1}"
