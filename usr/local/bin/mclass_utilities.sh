@@ -30,7 +30,7 @@ function cp_n_chown_n_chmod {
 	local __add_dot="${5}"
 	
 	if [[ -z "${__file_name}" || "${__file_name}" =~ [:space:] ]]; then
-		exit_err_1 "Wrong __file_name ${__file_name}"
+		exit_err_1 "Wrong __file_name '${__file_name}'"
 	fi
 	
     #????????????????????
@@ -40,11 +40,11 @@ function cp_n_chown_n_chmod {
     #????????????????????
     #????????????????????
 	if [[ ! "${__file_owners}" =~ ^[^[:space:]]+:[^[:space:]]+$ ]]; then
-		exit_err_1 "Wrong __file_owners ${__file_owners}"
+		exit_err_1 "Wrong __file_owners '${__file_owners}'"
 	fi
 	
 	if [[ ! -z "${__file_mask}" || "${__file_mask}" =~ ^[0124][0-7][0-7][0-7]$ ]]; then
-		exit_err_1 "Wrong __file_mask ${__file_mask}"
+		exit_err_1 "Wrong __file_mask '${__file_mask}'"
 	fi
 	
 	if [[ ! -d "${__dest_dir}" ]]; then
