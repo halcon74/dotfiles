@@ -43,7 +43,7 @@ function cp_n_chown_n_chmod {
 		exit_err_1 "Wrong __file_owners ${__file_owners}"
 	fi
 	
-	if [[ ! "${__file_mask}" =~ ^[0124][0-7][0-7][0-7]$ ]]; then
+	if [[ ! -z "${__file_mask}" || "${__file_mask}" =~ ^[0124][0-7][0-7][0-7]$ ]]; then
 		exit_err_1 "Wrong __file_mask ${__file_mask}"
 	fi
 	
@@ -60,19 +60,13 @@ function cp_n_chown_n_chmod {
 		__new_full_path="${__dest_dir}/${__base_name}"
 	fi
 	
-	set -x
 	# cp
-	cp "${__file_name}" "${__new_full_path}"
+	cp --verbose "${__file_name}" "${__new_full_path}"
 	# chown
-	chown "${__file_owners}" "${__new_full_path}"
-	set +x
+	chown --verbose "${__file_owners}" "${__new_full_path}"
 	
 	# chmod
-	if [[ -n "${__file_mask}" ]]; then
-		set -x
-		chmod "${__file_mask}" "${__new_full_path}"
-		set +x
-	fi
+	chmod "${__file_mask}" "${__new_full_path}"
 
 }
 
