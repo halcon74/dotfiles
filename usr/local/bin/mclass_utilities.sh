@@ -18,6 +18,70 @@
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
 # calling example: 
+# cp_n_chown_n_chmod "${$FILENAME}" 'root:'"${_user_name}" 750 '/usr/local/bin/'
+function cp_n_chown_n_chmod {
+
+	local __file_name="${1}"
+	local __file_owners="${2}"
+	local __file_mask="${3}"
+	local __dest_dir="${4}"
+	local __add_dot="${5}"
+	
+	if [[ -z "${__file_name}" || "${__file_name}" =~ [[:space:]] ]]; then
+		exit_err_1 'Wrong __file_name '"${__file_name}"
+	fi
+	
+	if [[ ! "${__file_owners}" =~ ^[^[:space:]]+:[^[:space:]]+$ ]]; then
+		exit_err_1 'Wrong __file_owners '"${__file_owners}"
+	fi
+	
+	if [[ ! "${__file_mask}" =~ ^[0-9][0-9][0-9]$ ]]; then
+		exit_err_1 'Wrong __file_mask '"${__file_mask}"
+	fi
+	
+	if [[ ! -d "${__dest_dir}" ]]; then
+		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
+	fi
+	
+	local __base_name="${__file_name##*/}"
+	local __new_full_path
+	
+	if [[ "${__add_dot}" -eq 1 ]]; then
+		__new_full_path="${__dest_dir}"'/.'"${__base_name}"
+	else
+		__new_full_path="${__dest_dir}"'/'"${__base_name}"
+	fi
+	
+	set -x
+	# cp
+	cp "${__file_name}" "${__new_full_path}"
+	# chown
+	chown "${__file_owners}" "${__new_full_path}"
+	set +x
+	
+	# chmod
+	if [[ -n "${__file_mask}" ]]; then
+		set -x
+		chmod "${__file_mask}" "${__new_full_path}"
+		set +x
+	fi
+
+}
+
+# calling example: 
+# exit_err_1 'Wrong category: '"${__category_name}"
+function exit_err_1 {
+	
+	local __arg_error="${1}"
+
+	echo "${__arg_error}"'.
+
+Exiting 1.'
+	exit 1
+
+}
+
+# calling example: 
 # local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 function find_in_array {
 	
@@ -38,16 +102,11 @@ function find_in_array {
 
 }
 
-# calling example: 
-# exit_err_1 'Wrong category: '"${__category_name}"
-function exit_err_1 {
+function get_user_name_from_tty {
+
+	local __user_name=$(ls -l `tty` | awk '{print $3}')
 	
-	local __arg_error="${1}"
-
-	echo "${__arg_error}"'.
-
-Exiting 1.'
-	exit 1
+	echo "${__user_name}"
 
 }
 
