@@ -44,11 +44,11 @@ if [[ ! -d "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such directory'
 fi
 
-_overlay_files=('overlay.xml' 'README.md')
-_overlay_portage_files=()
-
 _metadata_files=('layout.conf')
 _metadata_portage_files=()
+
+_overlay_files=('overlay.xml' 'README.md')
+_overlay_portage_files=()
 
 _profiles_files=('repo_name')
 _profiles_portage_files=('repo_name')
