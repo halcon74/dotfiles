@@ -37,7 +37,7 @@ function cp_n_chown_n_chmod {
 		exit_err_1 "Wrong __file_owners '${__file_owners}'"
 	fi
 	
-	if [[ ! -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124][0-7][0-7][0-7]$ ]]; then
+  if [[ ! -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
 		exit_err_1 "Wrong __file_mask '${__file_mask}'"
 	fi
 	
