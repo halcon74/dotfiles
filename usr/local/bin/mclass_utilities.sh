@@ -78,7 +78,7 @@ function exit_err_1 {
 
 	echo "${__arg_error}"'.
 
-Exiting 1.'
+Exiting 1.' >&2
 	exit 1
 
 }
