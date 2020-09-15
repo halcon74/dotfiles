@@ -122,26 +122,6 @@ function mkdir_n_chown {
 
 }
 
-function cp_n_chown {
-
-	local __file_owner="${1}"
-	local __filename="${2}"
-	
-	if [[ -z "${__filename}" || "${__filename}" =~ [\/] || "${__filename}" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __filename '"${__filename}"
-	fi
-
-	if [[ "${__file_owner}" == 'root' || "${__file_owner}" == 'portage' ]]; then
-		set -x
-		cp "${HALCONHG_DIR}${_active_path}"'/'"${__filename}" "${HALCONOVERLAY_DIR}${_active_path}"'/'
-		chown "${__file_owner}":"${__file_owner}" "${HALCONOVERLAY_DIR}${_active_path}"'/'"${__filename}"
-		set +x
-	else
-		exit_err_1 'Wrong __file_owner '"${__file_owner}"
-	fi
-
-}
-
 function handle_overlay_dir {
 
 	if [[ -d "${HALCONOVERLAY_DIR}" ]]; then
