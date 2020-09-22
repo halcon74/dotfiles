@@ -53,7 +53,7 @@ _categories=$(find "${HALCONOVERLAY_DIR}" -maxdepth 1 -mindepth 1 -type d | sort
 function add_to_my_active_path {
 
 	local __adding_path="${1}"
-	
+
 	if [[ -z "${__adding_path}" || "${__adding_path}" =~ [\/] || "${__adding_path}" =~ [[:space:]] ]]; then
 		exit_err_1 'Wrong __adding_path '"${__adding_path}"
 	fi
@@ -69,15 +69,15 @@ function clear_my_active_path {
 }
 
 function handle_manifests {
-	
+
 	local __manifest_file="${HALCONOVERLAY_DIR}${_active_path}"'/Manifest'
-	
+
 	set -x
 	rm "${__manifest_file}"
 	set +x
-	
+
 	local __find_files=$(find "${HALCONOVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
-	
+
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
@@ -92,17 +92,17 @@ function handle_manifests {
 	local __full_file_name="${HALCONOVERLAY_DIR}${_active_path}"'/'"${__manifest_filename}"
 	local __dest_dir="${HALCONHG_DIR}${_active_path}"
 	cp_n_chown_n_chmod "${__full_file_name}" "${_user_name}"':'"${_user_name}" 644 "${__dest_dir}"
-	
+
 }
 
 function handle_folders {
-	
+
 	local __find_folders=$(find "${HALCONOVERLAY_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
-	
+
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
 		local __find_foldername="${__find_folder##*/}"
-		
+
 		add_to_my_active_path "${__find_foldername}"
 		handle_manifests
 
@@ -115,13 +115,13 @@ function main {
 	local __my_category
 	for __my_category in $(echo "${_categories}"); do
 		local __category_name="${__my_category##*/}"
-		
+
 		clear_my_active_path
 		add_to_my_active_path "${__category_name}"
-		
+
 		if [[ "${__category_name}" != 'metadata' && "${__category_name}" != 'profiles' && "${__category_name}" != 'eclass' && "${__category_name}" != 'licenses' ]]; then
 			echo
-			
+
 			handle_folders
 		fi
 	done
@@ -129,5 +129,5 @@ function main {
 }
 
 main
-	
+
 exit 0

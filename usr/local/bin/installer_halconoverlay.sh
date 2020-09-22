@@ -80,17 +80,17 @@ function set_my_active_files {
 
 	local __file_type="${1}"
 	local __is_portage="${2}"
-	
+
 	local __find_in_keys_for_active_files=$(find_in_array "${__file_type}" "${_keys_for_active_files[@]}")
 	if [[ ${__find_in_keys_for_active_files} -ne 1 ]]; then
 		exit_err_1 'Wrong __file_type '"${__file_type}"
 	fi
-	
+
 	local __evaling_portage=''
 	if [[ "${__is_portage}" -eq 1 ]]; then
 		__evaling_portage='_portage'
 	fi
-	
+
 	eval _active_files=( '"${_'${__file_type}${__evaling_portage}'_files[@]}"' )
 
 }
@@ -98,7 +98,7 @@ function set_my_active_files {
 function add_to_my_active_path {
 
 	local __adding_path="${1}"
-	
+
 	if [[ -z "${__adding_path}" || "${__adding_path}" =~ [\/] || "${__adding_path}" =~ [[:space:]] ]]; then
 		exit_err_1 'Wrong __adding_path '"${__adding_path}"
 	fi
@@ -119,7 +119,7 @@ function mkdir_n_chown {
 
 	if [[ "${__dir_owner}" == 'root' || "${__dir_owner}" == 'portage' ]]; then
 		echo
-		
+
 		set -x
 		mkdir -p "${HALCONOVERLAY_DIR}${_active_path}"
 		chown "${__dir_owner}":"${__dir_owner}" "${HALCONOVERLAY_DIR}${_active_path}"
@@ -140,7 +140,7 @@ function handle_overlay_dir {
 If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
 		read USER_CHOICE
-		
+
 		if [[ "${USER_CHOICE}" == 'y' || "${USER_CHOICE}" == 'Y' ]]; then
 			echo
 			set -x
@@ -164,15 +164,15 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 function handle_overlay_files {
 
 	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | egrep -v "${_egrep_v_files_joined}" |sort)
-	
+
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
-		
+
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
 		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
-		
+
 		set_my_active_files "overlay" 0
 		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 		if [[ ${__find_in_my_files} -eq 1 ]]; then
@@ -180,7 +180,7 @@ function handle_overlay_files {
 		else
 			exit_err_1 'Wrong overlay file '"${_active_path}"'/'"${__find_filename}"
 		fi
-		
+
 	done
 
 }
@@ -188,17 +188,17 @@ function handle_overlay_files {
 function handle_service_files {
 
 	local __category_name="${1}"
-	
+
 	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
-	
+
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
-		
+
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
 		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
-		
+
 		if [[ "${__category_name}" == 'eclass' ]]; then
 			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
 				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
@@ -210,11 +210,11 @@ function handle_service_files {
 		else
 			set_my_active_files "${__category_name}" 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
-			
+
 			if [[ ${__find_in_my_files} -eq 1 ]]; then
 				set_my_active_files "${__category_name}" 1
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
-				
+
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
 					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 				else
@@ -231,29 +231,29 @@ function handle_service_files {
 function handle_tree_files {
 
 	local __no_tree_check="${1}"
-	
+
 	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
-	
+
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
-		
+
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
 		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
-		
+
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
-			
+
 			cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
 		else
 			set_my_active_files 'tree' 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
-			
+
 			if [[ ${__find_in_my_files} -eq 1 ]]; then
 				set_my_active_files 'tree' 1
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
-				
+
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
 					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
 				else
@@ -270,26 +270,26 @@ function handle_tree_files {
 }
 
 function handle_folders {
-	
+
 	local __find_folders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
-	
+
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
 		local __find_foldername="${__find_folder##*/}"
-		
+
 		add_to_my_active_path "${__find_foldername}"
 		mkdir_n_chown 'portage'
 		handle_tree_files ''
-		
+
 		local __find_subfolders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
-		
+
 		local __find_subfolder
 		for __find_subfolder in $(echo "${__find_subfolders}"); do
 			local __find_subfoldername="${__find_subfolder##*/}"
 			echo
-			
+
 			local __found_in_my_subfolders=$(find_in_array "${__find_subfoldername}" "${_subfolders[@]}")
-			
+
 			if [[ ${__found_in_my_subfolders} -eq 1 ]]; then
 				add_to_my_active_path "${__find_subfoldername}"
 				mkdir_n_chown 'root'
@@ -309,7 +309,7 @@ function check_diff {
 	echo
 
 	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_DIR}" | egrep -v "${_egrep_v_diff_joined}")
-	
+
 	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 
 '"${__diff_ur}"
@@ -326,11 +326,11 @@ function main {
 	for __my_category in $(echo "${_categories}"); do
 		local __category_name="${__my_category##*/}"
 		echo
-		
+
 		clear_my_active_path
 		add_to_my_active_path "${__category_name}"
 		mkdir_n_chown 'portage'
-		
+
 		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' || "${__category_name}" == 'licenses' ]]; then
 			handle_service_files "${__category_name}"
 		elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
@@ -339,12 +339,12 @@ function main {
 			exit_err_1 'Wrong category: '"${__category_name}"
 		fi
 	done
-	
+
 	check_diff
 
 }
 
 main
-	
+
 exit 0
 
