@@ -66,7 +66,15 @@ _subfolders=('files')
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_categories=$(find "${HALCONHG_DIR}" -maxdepth 1 -mindepth 1 -type d | grep -v '\.hg' | sort)
+_egrep_v_files=('\.hg' '\.shmg')
+_egrep_v_folders=('\.hg')
+_egrep_v_diff=(': \.hg')
+
+_egrep_v_files_joined=$(join_for_shell_regex "${_egrep_v_files[@]}")
+_egrep_v_folders_joined=$(join_for_shell_regex "${_egrep_v_folders[@]}")
+_egrep_v_diff_joined=$(join_for_shell_regex "${_egrep_v_diff[@]}")
+
+_categories=$(find "${HALCONHG_DIR}" -maxdepth 1 -mindepth 1 -type d | egrep -v "${_egrep_v_folders_joined}" | sort)
 
 function set_my_active_files {
 
@@ -155,7 +163,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_overlay_files {
 
-	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hg' |sort)
+	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | egrep -v "${_egrep_v_files_joined}" |sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -300,7 +308,7 @@ function check_diff {
 	echo
 	echo
 
-	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_DIR}" | grep -v ': \.hg')
+	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_DIR}" | egrep -v "${_egrep_v_diff_joined}")
 	
 	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 

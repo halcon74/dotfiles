@@ -71,6 +71,31 @@ function cp_n_chown_n_chmod {
 }
 
 # calling example: 
+# _egrep_v_files_joined=$(join_for_shell_regex "${_egrep_v_files[@]}")
+function join_for_shell_regex {
+
+	local __arg_array=("$@")
+	
+	local __joined
+
+	local __each
+	local i=0
+	for __each in ${__arg_array[@]}; do
+		if [[ "${i}" -eq 0 ]]; then
+			__joined="${__each}"
+		else
+			__joined="${__joined}"'|'"${__each}"
+		fi
+		i+=1
+	done
+	
+	__joined='('"${__joined}"')'
+	
+	echo ${__joined}
+
+}
+
+# calling example: 
 # exit_err_1 'Wrong category: '"${__category_name}"
 function exit_err_1 {
 	
