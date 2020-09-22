@@ -2,7 +2,7 @@
 
 # Collection of useful shell functions - utilities
 #
-# Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
+# Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

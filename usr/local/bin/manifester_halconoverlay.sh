@@ -6,7 +6,7 @@
 #
 # The script uses the following Environment Variables: ( HALCONOVERLAY_DIR HALCONHG_DIR )
 #
-# Copyright (C) 2020 Alexey Mishustin shumkar@shumkar.ru
+# Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
