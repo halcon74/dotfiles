@@ -66,7 +66,7 @@ _subfolders=('files')
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_egrep_v_files=('\.hg' '\.shmg')
+_egrep_v_files=('\.hg')
 _egrep_v_folders=('\.hg')
 _egrep_v_diff=(': \.hg')
 
