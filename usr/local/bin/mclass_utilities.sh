@@ -28,39 +28,39 @@ function cp_n_chown_n_chmod {
 	local __file_mask="${3}"
 	local __dest_dir="${4}"
 	local __add_dot="${5}"
-	
+
 	if [[ -z "${__file_name}" || "${__file_name}" =~ [[:space:]] ]]; then
 		exit_err_1 'Wrong __file_name '"${__file_name}"
 	fi
-	
+
 	if [[ -z "${__file_owners}" || ! "${__file_owners}" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
 		exit_err_1 'Wrong __file_owners '"${__file_owners}"
 	fi
-	
+
 	if [[ -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
 		exit_err_1 'Wrong __file_mask '"${__file_mask}"
 	fi
-	
+
 	if [[ ! -d "${__dest_dir}" ]]; then
 		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
 	fi
-	
+
 	local __base_name="${__file_name##*/}"
 	local __new_full_path
-	
+
 	if [[ "${__add_dot}" -eq 1 ]]; then
 		__new_full_path="${__dest_dir}"'/.'"${__base_name}"
 	else
 		__new_full_path="${__dest_dir}"'/'"${__base_name}"
 	fi
-	
+
 	set -x
 	# cp
 	cp "${__file_name}" "${__new_full_path}"
 	# chown
 	chown "${__file_owners}" "${__new_full_path}"
 	set +x
-	
+
 	# chmod
 	if [[ -n "${__file_mask}" ]]; then
 		set -x
@@ -73,7 +73,7 @@ function cp_n_chown_n_chmod {
 # calling example: 
 # exit_err_1 'Wrong category: '"${__category_name}"
 function exit_err_1 {
-	
+
 	local __arg_error="${1}"
 
 	echo "${__arg_error}"'.
@@ -86,11 +86,11 @@ Exiting 1.' >&2
 # calling example: 
 # local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 function find_in_array {
-	
+
 	local __arg_value="${1}"
 	shift
 	local __arg_array=("$@")
-	
+
 	local __found=0
 	local __each
 	for __each in ${__arg_array[@]}; do
@@ -99,7 +99,7 @@ function find_in_array {
 			break
 		fi
 	done
-	
+
 	echo ${__found}
 
 }
@@ -113,7 +113,7 @@ function get_newest_dir {
 }
 
 function get_user_name_from_tty {
-	
+
 	echo $(ls -l `tty` | awk '{print $3}')
 
 }
@@ -123,7 +123,7 @@ function get_user_name_from_tty {
 function join_for_shell_regex {
 
 	local __arg_array=("$@")
-	
+
 	local __joined
 
 	local __each
@@ -136,9 +136,9 @@ function join_for_shell_regex {
 		fi
 		__i+=1
 	done
-	
+
 	__joined='('"${__joined}"')'
-	
+
 	echo ${__joined}
 
 }
@@ -149,13 +149,13 @@ function read_env_or_conf_var {
 
 	local __the_name="${1}"
 	local __the_conffile="${2}"
-	
+
 	local __the_value=$(grep "${__the_name}" "${__the_conffile}" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"${__the_name}"'=(.+)$/\1/')
-	
+
 	if [[ -z "${__the_value}" ]]; then
 		__the_value=${!__the_name}
 	fi
-	
+
 	echo "${__the_value}"
 
 }
