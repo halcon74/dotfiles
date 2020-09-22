@@ -113,10 +113,8 @@ function get_newest_dir {
 }
 
 function get_user_name_from_tty {
-
-	local __user_name=$(ls -l `tty` | awk '{print $3}')
 	
-	echo "${__user_name}"
+	echo $(ls -l `tty` | awk '{print $3}')
 
 }
 
