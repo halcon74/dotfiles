@@ -144,13 +144,26 @@ function join_for_shell_regex {
 }
 
 # calling example: 
+# HALCONHG_DIR=$(read_conf_var 'HALCONHG_DIR' "${_conf_file}")
+function read_conf_var {
+
+	local __the_name="${1}"
+	local __the_conffile="${2}"
+
+	local __the_value=$(grep "${__the_name}" "${__the_conffile}" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"${__the_name}"'=(.+)$/\1/')
+
+	echo "${__the_value}"
+
+}
+
+# calling example: 
 # HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
 function read_env_or_conf_var {
 
 	local __the_name="${1}"
 	local __the_conffile="${2}"
 
-	local __the_value=$(grep "${__the_name}" "${__the_conffile}" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"${__the_name}"'=(.+)$/\1/')
+	local __the_value=$(read_conf_var "${__the_name}" "${__the_conffile}")
 
 	if [[ -z "${__the_value}" ]]; then
 		__the_value=${!__the_name}
