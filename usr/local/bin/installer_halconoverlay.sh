@@ -50,8 +50,8 @@ _metadata_portage_files=()
 _overlay_files=('overlay.xml' 'README.md')
 _overlay_portage_files=()
 
-_profiles_files=('repo_name')
-_profiles_portage_files=('repo_name')
+_profiles_files=('repo_name' 'use.desc' 'use.local.desc')
+_profiles_portage_files=()
 
 _tree_files=('Manifest' 'metadata.xml')
 _tree_portage_files=('metadata.xml')
@@ -155,7 +155,7 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_overlay_files {
 
-	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hgignore' |sort)
+	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | grep -v '\.hg' |sort)
 	
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
