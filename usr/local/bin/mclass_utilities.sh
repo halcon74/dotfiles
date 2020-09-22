@@ -81,7 +81,7 @@ function join_for_shell_regex {
 	local __each
 	local __i=0
 	for __each in ${__arg_array[@]}; do
-		if [[ "${i}" -eq 0 ]]; then
+		if [[ "${__i}" -eq 0 ]]; then
 			__joined="${__each}"
 		else
 			__joined="${__joined}"'|'"${__each}"
