@@ -108,7 +108,7 @@ function get_newest_dir {
 
 	local __path="${1}"
 
-	echo $(ls -t "${__path}") | awk '{print $1}' | perl -pe 'chomp'
+	echo $(ls -t "${__path}") | awk '{print $1}'
 
 }
 
