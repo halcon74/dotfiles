@@ -104,6 +104,14 @@ function find_in_array {
 
 }
 
+function get_newest_dir {
+
+	local __path="${1}"
+
+	echo $(ls -t "${__path}") | awk '{print $1}'
+
+}
+
 function get_user_name_from_tty {
 
 	local __user_name=$(ls -l `tty` | awk '{print $3}')
