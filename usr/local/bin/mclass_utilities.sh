@@ -181,7 +181,7 @@ function read_conf_var {
 			$(exit_err_1 "Found double quotes inside ${__the_name}")
 		fi
 	else
-		__the_value=''
+		$(exit_err_1 'A very interesting case')
 	fi
 
 	echo "${__the_value}"
