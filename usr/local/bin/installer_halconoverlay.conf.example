@@ -1,4 +1,5 @@
 # All variables may be set as Environment Variables (in /root/.bashrc)
 # The values of Environment Variables are used only if the corresponding values in this file are not set or are empty
 HALCONOVERLAY_DIR=/var/db/repos/localrepo
-HALCONHG_DIR=/home/user/myPrograms/myOverlay
+HALCONHG_DIR='/home/user/myPrograms/myOverlay'
+HALCONHG_REMOTE="protocol://user@uri"

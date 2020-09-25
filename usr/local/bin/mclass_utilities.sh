@@ -150,7 +150,27 @@ function read_conf_var {
 	local __the_name="${1}"
 	local __the_conffile="${2}"
 
-	local __the_value=$(grep "${__the_name}" "${__the_conffile}" | egrep -v '^[[:space:]]*#|^[[:space:]]*$' | sed -n '1p' | sed -r 's/'"${__the_name}"'=(.+)$/\1/')
+	local __var_containing=$(egrep "^[[:space:]]*${__the_name}=[^=]*" "${__the_conffile}")
+	local __var_containing_lines=$(echo "${__var_containing}" | wc -l)
+	
+	if [[ __var_containing_lines -gt 1 ]]; then
+		exit_err_1 "Found ${__var_containing_lines} entries for ${__the_name}"
+	fi
+	
+	local __check_no_quotes=$(echo "${__var_containing}" | egrep -v $'=(\'|\")')
+	local __check_single_quotes=$(echo "${__var_containing}" | egrep $'=\'')
+	local __check_double_quotes=$(echo "${__var_containing}" | egrep $'=\"')
+	local __the_value
+	
+	if [[ -n "${__check_no_quotes}" ]]; then
+		__the_value=$(echo "${__var_containing}"| sed -r 's/.+=(.+)$/\1/')
+	elif [[ -n "${__check_single_quotes}" ]]; then
+		__the_value=$(echo "${__var_containing}"| sed -r "s/.+='(.+)'$/\1/")
+	elif [[ -n "${__check_double_quotes}" ]]; then
+		__the_value=$(echo "${__var_containing}"| sed -r 's/.+="(.+)"$/\1/')
+	else
+		__the_value=''
+	fi
 
 	echo "${__the_value}"
 
@@ -170,6 +190,20 @@ function read_env_or_conf_var {
 	fi
 
 	echo "${__the_value}"
+
+}
+
+function trace_on {
+
+	set -x
+	
+}
+
+function trace_off {
+
+	local __prev_status=${?}
+	set +x
+	exit ${__prev_status}
 
 }
 
