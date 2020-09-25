@@ -48,7 +48,7 @@ set -x
 pushd "${HALCONHG_DIR}"
 set +x
 
-_exists_branch=$(hg branches | grep "${_branch}"| wc -l)
+_exists_branch=$(hg branches | grep "${_branch}" | wc -l)
 
 if [[ "${_exists_branch}" -ne 1 ]]; then
 	exit_err_1 'hg branch error: _exists_branch='"${_exists_branch}"
@@ -60,7 +60,7 @@ if [[ "${_bookmark}" == 'default' ]]; then
 fi
 
 set -x
-LC_ALL=C hg bookmark --rev 'tip' "${_bookmark}"
+LC_ALL=C hg bookmark --rev tip "${_bookmark}"
 LC_ALL=C hg push --verbose "${HALCONHG_REMOTE}"
 popd
 set +x
