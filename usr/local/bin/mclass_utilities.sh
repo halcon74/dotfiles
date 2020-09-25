@@ -150,7 +150,7 @@ function read_conf_var {
 	local __the_name="${1}"
 	local __the_conffile="${2}"
 
-	local __var_containing=$(egrep "^[[:space:]]*${__the_name}=[^=]*" "${__the_conffile}")
+	local __var_containing=$(egrep "^[[:space:]]*${__the_name}=[^=]*$" "${__the_conffile}")
 	local __var_containing_lines=$(echo "${__var_containing}" | wc -l)
 	
 	if [[ __var_containing_lines -gt 1 ]]; then
