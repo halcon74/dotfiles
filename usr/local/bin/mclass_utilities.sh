@@ -166,19 +166,19 @@ function read_conf_var {
 		__the_value=$(echo "${__var_containing}"| sed -r 's/.+=(.+)$/\1/')
 		local __check_quotes_inside=$(echo "${__the_value}" | egrep $'(\'|\")')
 		if [[ -n "${__check_quotes_inside}" ]]; then
-			$(exit_err_1 "Found quotes_inside ${__the_name}")
+			$(exit_err_1 "Found quotes inside ${__the_name}")
 		fi
 	elif [[ -n "${__check_single_quotes}" ]]; then
 		__the_value=$(echo "${__var_containing}"| sed -r "s/.+='(.+)'$/\1/")
 		local __check_single_quotes_inside=$(echo "${__the_value}" | egrep $'\'')
 		if [[ -n "${__check_single_quotes_inside}" ]]; then
-			$(exit_err_1 "Found single quotes_inside ${__the_name}")
+			$(exit_err_1 "Found single quotes inside ${__the_name}")
 		fi
 	elif [[ -n "${__check_double_quotes}" ]]; then
 		__the_value=$(echo "${__var_containing}"| sed -r 's/.+="(.+)"$/\1/')
 		local __check_double_quotes_inside=$(echo "${__the_value}" | egrep $'\"')
 		if [[ -n "${__check_double_quotes_inside}" ]]; then
-			$(exit_err_1 "Found double quotes_inside ${__the_name}")
+			$(exit_err_1 "Found double quotes inside ${__the_name}")
 		fi
 	else
 		__the_value=''
