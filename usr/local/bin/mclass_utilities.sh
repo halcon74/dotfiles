@@ -195,15 +195,14 @@ function read_env_or_conf_var {
 
 function trace_on {
 
-	set -x
+	set -x 1>&2 2>/dev/null
 	
 }
 
 function trace_off {
 
-	local __prev_status=${?}
-	set +x
-	exit ${__prev_status}
+	{ __prev_status=$? ; set +x; } 1>&2 2>/dev/null;
+	echo ${__prev_status}
 
 }
 

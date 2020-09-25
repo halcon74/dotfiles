@@ -23,10 +23,6 @@ _branch="${1}"
 
 source /usr/local/bin/mclass_utilities.sh
 
-shopt -s expand_aliases
-alias trace_on='set -x'
-alias trace_off='{ PREV_STATUS=$? ; set +x; } 2>/dev/null; (exit ${PREV_STATUS})'
-
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
@@ -48,6 +44,10 @@ if [[ -z "${_branch}" ]]; then
 	exit_err_1 'branch argument is not passed'
 fi
 
+set -x
+pushd "${HALCONHG_DIR}"
+set +x
+
 _exists_branch=$(hg branches | grep "${_branch}"| wc -l)
 
 if [[ "${_exists_branch}" -ne 1 ]]; then
@@ -60,7 +60,6 @@ if [[ "${_bookmark}" == 'default' ]]; then
 fi
 
 trace_on
-pushd "${HALCONHG_DIR}"
 hg bookmark --rev tip "${_bookmark}"
 trace_off
 
