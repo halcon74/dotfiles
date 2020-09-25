@@ -59,15 +59,8 @@ if [[ "${_bookmark}" == 'default' ]]; then
 	_bookmark='master'
 fi
 
-trace_on
-hg bookmark --rev tip "${_bookmark}"
-trace_off
-
-if [[ $? -ne 0 ]]; then
-	exit_err_1 "can't move bookmark to tip"
-fi
-
 set -x
+LC_ALL=C hg bookmark --rev 'tip' "${_bookmark}"
 LC_ALL=C hg push --verbose "${HALCONHG_REMOTE}"
 popd
 set +x
