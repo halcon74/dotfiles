@@ -2,6 +2,7 @@
 
 # Helper script for pushing to halcon-overlay
 # Pushes a local hg (Mercurial) repository with different branches and bookmarks to a remote repository in the way compatible with hg-git
+#
 # The script uses the following Environment Variables: ( HALCONHG_DIR HALCONHG_REMOTE )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io

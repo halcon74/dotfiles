@@ -30,19 +30,19 @@ function cp_n_chown_n_chmod {
 	local __add_dot="${5}"
 
 	if [[ -z "${__file_name}" || "${__file_name}" =~ [[:space:]] ]]; then
-		exit_err_1 'Wrong __file_name '"${__file_name}"
+		$(exit_err_1 'Wrong __file_name '"${__file_name}")
 	fi
 
 	if [[ -z "${__file_owners}" || ! "${__file_owners}" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
-		exit_err_1 'Wrong __file_owners '"${__file_owners}"
+		$(exit_err_1 'Wrong __file_owners '"${__file_owners}")
 	fi
 
 	if [[ -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
-		exit_err_1 'Wrong __file_mask '"${__file_mask}"
+		$(exit_err_1 'Wrong __file_mask '"${__file_mask}")
 	fi
 
 	if [[ ! -d "${__dest_dir}" ]]; then
-		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
+		$(exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory')
 	fi
 
 	local __base_name="${__file_name##*/}"
@@ -154,7 +154,7 @@ function read_conf_var {
 	local __var_containing_lines=$(echo "${__var_containing}" | wc -l)
 	
 	if [[ __var_containing_lines -gt 1 ]]; then
-		exit_err_1 "Found ${__var_containing_lines} entries for ${__the_name}"
+		$(exit_err_1 "Found ${__var_containing_lines} entries for ${__the_name}")
 	fi
 	
 	local __check_no_quotes=$(echo "${__var_containing}" | egrep -v $'=(\'|\")')
@@ -164,10 +164,22 @@ function read_conf_var {
 	
 	if [[ -n "${__check_no_quotes}" ]]; then
 		__the_value=$(echo "${__var_containing}"| sed -r 's/.+=(.+)$/\1/')
+		local __check_quotes_inside=$(echo "${__the_value}" | egrep $'(\'|\")')
+		if [[ -n "${__check_quotes_inside}" ]]; then
+			$(exit_err_1 "Found quotes_inside ${__the_name}")
+		fi
 	elif [[ -n "${__check_single_quotes}" ]]; then
 		__the_value=$(echo "${__var_containing}"| sed -r "s/.+='(.+)'$/\1/")
+		local __check_single_quotes_inside=$(echo "${__the_value}" | egrep $'\'')
+		if [[ -n "${__check_single_quotes_inside}" ]]; then
+			$(exit_err_1 "Found single quotes_inside ${__the_name}")
+		fi
 	elif [[ -n "${__check_double_quotes}" ]]; then
 		__the_value=$(echo "${__var_containing}"| sed -r 's/.+="(.+)"$/\1/')
+		local __check_double_quotes_inside=$(echo "${__the_value}" | egrep $'\"')
+		if [[ -n "${__check_double_quotes_inside}" ]]; then
+			$(exit_err_1 "Found double quotes_inside ${__the_name}")
+		fi
 	else
 		__the_value=''
 	fi
