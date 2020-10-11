@@ -27,8 +27,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}")
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
+HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}") || exit $?
+HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 
 if [[ -z "${HALCONOVERLAY_DIR}" ]]; then
 	exit_err_1 'HALCONOVERLAY_DIR is not set'
@@ -176,7 +176,7 @@ function handle_overlay_files {
 		set_my_active_files "overlay" 0
 		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 		if [[ ${__find_in_my_files} -eq 1 ]]; then
-			cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
+			cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}" || exit $?
 		else
 			exit_err_1 'Wrong overlay file '"${_active_path}"'/'"${__find_filename}"
 		fi
@@ -201,12 +201,12 @@ function handle_service_files {
 
 		if [[ "${__category_name}" == 'eclass' ]]; then
 			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
-				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}" || exit $?
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
 			fi
 		elif [[ "${__category_name}" == 'licenses' ]]; then
-				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}" || exit $?
 		else
 			set_my_active_files "${__category_name}" 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -216,9 +216,9 @@ function handle_service_files {
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
-					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}" || exit $?
 				else
-					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}" || exit $?
 				fi
 			else
 				exit_err_1 'Wrong service file '"${_active_path}"'/'"${__find_filename}"
@@ -245,7 +245,7 @@ function handle_tree_files {
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 
-			cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
+			cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}" || exit $?
 		else
 			set_my_active_files 'tree' 0
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -255,12 +255,12 @@ function handle_tree_files {
 				local __found_in_my_portage_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
 
 				if [[ ${__found_in_my_portage_files} -eq 1 ]]; then
-					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'portage:portage' 644 "${__dest_dir}" || exit $?
 				else
-					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
+					cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}" || exit $?
 				fi
 			elif [[ "${__find_filename}" =~ ^.+\.ebuild$ ]]; then
-				cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}"
+				cp_n_chown_n_chmod "${__full_file_name}" 'root:root' 644 "${__dest_dir}" || exit $?
 			else
 				exit_err_1 'Wrong tree file '"${_active_path}"'/'"${__find_filename}"
 			fi

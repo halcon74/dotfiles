@@ -27,8 +27,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
-HALCONHG_REMOTE=$(read_env_or_conf_var 'HALCONHG_REMOTE' "${_conf_file}")
+HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
+HALCONHG_REMOTE=$(read_env_or_conf_var 'HALCONHG_REMOTE' "${_conf_file}") || exit $?
 
 if [[ -z "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR is not set'

@@ -26,8 +26,8 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}")
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
+HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}") || exit $?
+HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 
 if [[ -z "${HALCONOVERLAY_DIR}" ]]; then
 	exit_err_1 'HALCONOVERLAY_DIR is not set'
@@ -91,7 +91,7 @@ function handle_manifests {
 	local __manifest_filename="${__manifest_file##*/}"
 	local __full_file_name="${HALCONOVERLAY_DIR}${_active_path}"'/'"${__manifest_filename}"
 	local __dest_dir="${HALCONHG_DIR}${_active_path}"
-	cp_n_chown_n_chmod "${__full_file_name}" "${_user_name}"':'"${_user_name}" 644 "${__dest_dir}"
+	cp_n_chown_n_chmod "${__full_file_name}" "${_user_name}"':'"${_user_name}" 644 "${__dest_dir}" || exit $?
 
 }
 
