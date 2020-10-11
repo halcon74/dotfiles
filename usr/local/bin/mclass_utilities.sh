@@ -210,7 +210,7 @@ function join_for_shell_regex {
 }
 
 # calling example:
-# HALCONHG_DIR=$(read_conf_var 'HALCONHG_DIR' "${_conf_file}")
+# HALCONHG_DIR=$(read_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 function read_conf_var {
 
 	local __the_name="${1}"
@@ -255,7 +255,7 @@ function read_conf_var {
 }
 
 # calling example:
-# HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}")
+# HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 function read_env_or_conf_var {
 
 	local __the_name="${1}"
