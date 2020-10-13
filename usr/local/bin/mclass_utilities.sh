@@ -24,9 +24,7 @@
 function check_file_mask {
 
 	local __file_mask="${1}"
-#	set -x
 	if [[ -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
-#		set +x
 		exit_err_1 'Wrong __file_mask '"${__file_mask}"
 	fi
 
@@ -42,10 +40,8 @@ function check_file_owners {
 	__file_owners_regex+=':'
 	__file_owners_regex+=$(get_uid_gid_regex)
 	__file_owners_regex+='$'
-#	set -x
 ## MY COMMENT ## A variable containing a regex must be not quoted
 	if [[ -z "${__file_owners}" || ! "${__file_owners}" =~ ${__file_owners_regex} ]]; then
-#		set +x
 		exit_err_1 'Wrong __file_owners '"${__file_owners}"
 	fi
 
@@ -59,10 +55,8 @@ function check_uid_gid {
 	local __uid_gid_regex='^'
 	__uid_gid_regex+=$(get_uid_gid_regex)
 	__uid_gid_regex+='$'
-#	set -x
 ## MY COMMENT ## A variable containing a regex must be not quoted
 	if [[ -z "${__uid_gid}" || ! "${__uid_gid}" =~ ${__uid_gid_regex} ]]; then
-#		set +x
 		exit_err_1 'Wrong __uid_gid '"${__uid_gid}"
 	fi
 
@@ -78,9 +72,7 @@ function cp_n_chown_n_chmod {
 	local __dest_dir="${4}"
 	local __add_dot="${5}"
 
-#	set -x
 	if [[ -z "${__file_name}" || "${__file_name}" =~ [[:space:]] ]]; then
-#		set +x
 		exit_err_1 'Wrong __file_name '"${__file_name}"
 	fi
 
