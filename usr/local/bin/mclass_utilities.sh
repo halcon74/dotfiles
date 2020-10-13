@@ -149,7 +149,19 @@ function find_in_array {
 }
 
 # calling example:
-# newest_dir = $(get_newest_dir "${__path}" "${__exclude}") || exit $?
+# local __mounted=$(get_mounted "${__mount_name}")
+function get_mounted {
+
+	local __mount_point="${1}"
+
+	local __mounted=$(cat /proc/mounts | grep "${__mount_point}" | wc -l)
+	
+	echo "${__mounted}"
+
+}
+
+# calling example:
+# newest_dir=$(get_newest_dir "${__path}" "${__exclude}") || exit $?
 function get_newest_dir {
 
 	local __path="${1}"
@@ -158,13 +170,21 @@ function get_newest_dir {
 	if [[ -z "${__exclude}" ]]; then
 		echo $(ls -t "${__path}" | sed -n '1p')
 	else
-#		set -x
 		if [[ "${__exclude}" =~ [[:space:]] ]]; then
-#			set +x
 			exit_err_1 'Wrong __exclude '"${__exclude}"
 		fi
 		echo $(ls -t "${__path}" | grep -v "${__exclude}" | sed -n '1p')
 	fi
+
+}
+
+# calling example:
+# _ntp_client_status=$(rc-service ntp-client status | get_rc_status)
+function get_rc_status {
+
+	read __get_rc_status_arg
+
+	echo "${__get_rc_status_arg}" | sed -r 's/.+\:[[:space:]](.+)/\1/'
 
 }
 
