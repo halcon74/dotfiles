@@ -5,7 +5,7 @@
 # Checking that files/folders names are permitted in the overlay
 # Should be called by root
 #
-# The script uses the following Environment Variables: ( HALCONOVERLAY_DIR HALCONHG_DIR )
+# The script uses the following Environment Variables: ( HALCONOVERLAY_LOCAL_DIR HALCONHG_DIR )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
@@ -27,18 +27,18 @@ source /usr/local/bin/mclass_utilities.sh
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
-HALCONOVERLAY_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_DIR' "${_conf_file}") || exit $?
+HALCONOVERLAY_LOCAL_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_LOCAL_DIR' "${_conf_file}") || exit $?
 HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 
-if [[ -z "${HALCONOVERLAY_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_DIR is not set'
+if [[ -z "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_LOCAL_DIR is not set'
 fi
 if [[ -z "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR is not set'
 fi
 
-if [[ ! -d "${HALCONOVERLAY_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_DIR='"${HALCONOVERLAY_DIR}"': No such directory'
+if [[ ! -d "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
+	exit_err_1 'HALCONOVERLAY_LOCAL_DIR='"${HALCONOVERLAY_LOCAL_DIR}"': No such directory'
 fi
 if [[ ! -d "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such directory'
@@ -121,8 +121,8 @@ function mkdir_n_chown {
 		echo
 
 		set -x
-		mkdir -p "${HALCONOVERLAY_DIR}${_active_path}"
-		chown "${__dir_owner}":"${__dir_owner}" "${HALCONOVERLAY_DIR}${_active_path}"
+		mkdir -p "${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
+		chown "${__dir_owner}":"${__dir_owner}" "${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
 		set +x
 	else
 		exit_err_1 'Wrong __dir_owner '"${__dir_owner}"
@@ -132,10 +132,10 @@ function mkdir_n_chown {
 
 function handle_overlay_dir {
 
-	if [[ -d "${HALCONOVERLAY_DIR}" ]]; then
+	if [[ -d "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
 		echo
 		echo 'ATTENTION! Delete this directory?
-   '"${HALCONOVERLAY_DIR}"'
+   '"${HALCONOVERLAY_LOCAL_DIR}"'
 (y/n)
 If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
@@ -144,9 +144,9 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		if [[ "${USER_CHOICE}" == 'y' || "${USER_CHOICE}" == 'Y' ]]; then
 			echo
 			set -x
-			rm -r "${HALCONOVERLAY_DIR}"
-			mkdir -p "${HALCONOVERLAY_DIR}"
-			chown root:root "${HALCONOVERLAY_DIR}"
+			rm -r "${HALCONOVERLAY_LOCAL_DIR}"
+			mkdir -p "${HALCONOVERLAY_LOCAL_DIR}"
+			chown root:root "${HALCONOVERLAY_LOCAL_DIR}"
 			set +x
 		else
 			echo
@@ -154,8 +154,8 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		fi
 	else
 		set -x
-		mkdir -p "${HALCONOVERLAY_DIR}"
-		chown root:root "${HALCONOVERLAY_DIR}"
+		mkdir -p "${HALCONOVERLAY_LOCAL_DIR}"
+		chown root:root "${HALCONOVERLAY_LOCAL_DIR}"
 		set +x
 	fi
 
@@ -171,7 +171,7 @@ function handle_overlay_files {
 		echo
 
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
 
 		set_my_active_files "overlay" 0
 		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -197,7 +197,7 @@ function handle_service_files {
 		echo
 
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
 
 		if [[ "${__category_name}" == 'eclass' ]]; then
 			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
@@ -240,7 +240,7 @@ function handle_tree_files {
 		echo
 
 		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_DIR}${_active_path}"
+		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
 
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -308,7 +308,7 @@ function check_diff {
 	echo
 	echo
 
-	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_DIR}" | egrep -v "${_egrep_v_diff_joined}")
+	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_LOCAL_DIR}" | egrep -v "${_egrep_v_diff_joined}")
 
 	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 
@@ -347,4 +347,3 @@ function main {
 main
 
 exit 0
-

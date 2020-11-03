@@ -24,6 +24,10 @@ _branch="${1}"
 
 source /usr/local/bin/mclass_utilities.sh
 
+if [[ -z "${_branch}" ]]; then
+	exit_err_1 'branch argument is not passed'
+fi
+
 # Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
 
@@ -39,10 +43,6 @@ fi
 
 if [[ ! -d "${HALCONHG_DIR}" ]]; then
 	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such diectory'
-fi
-
-if [[ -z "${_branch}" ]]; then
-	exit_err_1 'branch argument is not passed'
 fi
 
 set -x
