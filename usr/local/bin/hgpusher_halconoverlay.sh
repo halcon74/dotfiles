@@ -20,6 +20,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
+# Usage: 
+# hgpusher_halconoverlay.sh default
+# or
+# hgpusher_halconoverlay.sh some_other_hg_branch
 _branch="${1}"
 
 source /usr/local/bin/mclass_utilities.sh
