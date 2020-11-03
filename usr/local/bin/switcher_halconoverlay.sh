@@ -25,6 +25,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
+# Usage: 
+# switcher_halconoverlay.sh local
+# or
+# switcher_halconoverlay.sh remote
 _local_or_remote="${1}"
 
 source /usr/local/bin/mclass_utilities.sh
