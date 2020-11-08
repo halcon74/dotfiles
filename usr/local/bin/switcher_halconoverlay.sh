@@ -205,6 +205,13 @@ function uncomment_repo {
 
 function main {
 
+	if [[ "${_local_or_remote}" == 'local' ]]; then
+		# 'halcon-overlay' can remain in 'localrepo' after the work of installer_halconoverlay
+		set -x
+		echo ${_repo_name['local']} > "${HALCONOVERLAY_LOCAL_DIR}/profiles/repo_name"
+		set +x
+	fi
+
 	check_both_repos
 
 	set_data_for_repo 'local'
