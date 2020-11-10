@@ -66,7 +66,7 @@ function main {
 emerger.sh: '"${__current_date}"'
 '
 		echo "${__lines_with_date}" >> "${_log_file}"
-		emerge --color=y "${_all_args[@]}" | tee -a "${_log_file}"
+		emerge "${_all_args[@]}" --color=y | tee -a "${_log_file}"
 	else
 		emerge "${_all_args[@]}"
 	fi
