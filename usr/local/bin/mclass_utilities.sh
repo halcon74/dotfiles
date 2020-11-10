@@ -18,11 +18,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; If not, see <https://www.gnu.org/licenses/>.
 
+# "Internal methods" (functions currently not used by other scripts) names are marked with _
+
 # In the alphabet order:
 
 # calling example:
-# check_file_mask "${__file_mask}" || exit $?
-function check_file_mask {
+# _check_file_mask "${__file_mask}" || exit $?
+function _check_file_mask {
 
 	local __file_mask="${1}"
 	if [[ -z "${__file_mask}" || ! "${__file_mask}" =~ ^[0124]?[0-7][0-7][0-7]$ ]]; then
@@ -32,14 +34,14 @@ function check_file_mask {
 }
 
 # calling example:
-# check_file_owners "${__file_owners}" || exit $?
-function check_file_owners {
+# _check_file_owners "${__file_owners}" || exit $?
+function _check_file_owners {
 
 	local __file_owners="${1}"
 	local __file_owners_regex='^'
-	__file_owners_regex+=$(get_uid_gid_regex)
+	__file_owners_regex+=$(_get_uid_gid_regex)
 	__file_owners_regex+=':'
-	__file_owners_regex+=$(get_uid_gid_regex)
+	__file_owners_regex+=$(_get_uid_gid_regex)
 	__file_owners_regex+='$'
 ## MY COMMENT ## A variable containing a regex must be not quoted
 	if [[ -z "${__file_owners}" || ! "${__file_owners}" =~ ${__file_owners_regex} ]]; then
@@ -54,7 +56,7 @@ function check_uid_gid {
 
 	local __uid_gid="${1}"
 	local __uid_gid_regex='^'
-	__uid_gid_regex+=$(get_uid_gid_regex)
+	__uid_gid_regex+=$(_get_uid_gid_regex)
 	__uid_gid_regex+='$'
 ## MY COMMENT ## A variable containing a regex must be not quoted
 	if [[ -z "${__uid_gid}" || ! "${__uid_gid}" =~ ${__uid_gid_regex} ]]; then
@@ -77,9 +79,9 @@ function cp_n_chown_n_chmod {
 		exit_err_1 'Wrong __file_name '"${__file_name}"
 	fi
 
-	check_file_owners "${__file_owners}" || exit $?
+	_check_file_owners "${__file_owners}" || exit $?
 
-	check_file_mask "${__file_mask}" || exit $?
+	_check_file_mask "${__file_mask}" || exit $?
 	
 	if [[ ! -d "${__dest_dir}" ]]; then
 		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
@@ -186,8 +188,8 @@ function get_rc_status {
 }
 
 # calling example:
-# __file_owners_regex+=$(get_uid_gid_regex)
-function get_uid_gid_regex {
+# __file_owners_regex+=$(_get_uid_gid_regex)
+function _get_uid_gid_regex {
 
 	echo '[a-zA-Z0-9._-]+'
 
