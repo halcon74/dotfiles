@@ -48,7 +48,7 @@ for _arg in "$@"; do
 	_all_args+=("${_arg}")
 	let "_arg_num+=1"
 	if [[ ! "${_arg}" =~ ${_arg_regex} ]]; then
-		exit_err_1 'A parameter '"${_arg}"' does not match the regex '"${_arg_regex}"
+		exit_err_1 'The parameter '"${_arg}"' does not match the regex '"${_arg_regex}"
 	fi
 	if [[ ${_arg_num} -eq 1 ]]; then
 		_sync_or_not_sync="${_arg}"
