@@ -1,6 +1,7 @@
-#!/bin/bash
-
+# No shebang
+#
 # Collection of useful shell functions - utilities
+# Should be called from other scripts
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
