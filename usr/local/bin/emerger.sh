@@ -2,7 +2,7 @@
 
 # Script-alias for `emerge`, giving the possibility to log the output of `emerge --sync`, preserving color, with date added
 #
-# The script is intended to be copied to a location in PATH (for example, /usr/loca/bin), and after that
+# The script is intended to be copied to a location in PATH (for example, /usr/local/bin), and after that
 # the folllowing line should be added to shell aliases of root OR of a user in 'wheel' group:
 # alias emerge='emerger.sh'
 #
