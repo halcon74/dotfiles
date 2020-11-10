@@ -79,6 +79,10 @@ function cp_n_chown_n_chmod {
 	check_file_owners "${__file_owners}" || exit $?
 
 	check_file_mask "${__file_mask}" || exit $?
+	
+	if [[ ! -d "${__dest_dir}" ]]; then
+		exit_err_1 '__dest_dir='"${__dest_dir}"': No such directory'
+	fi
 
 	local __base_name="${__file_name##*/}"
 	local __new_full_path
