@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # Script-alias for `emerge`, giving the possibility to log the output of `emerge --sync`, preserving color, with date added
 #
 # The script is intended to be copied to a location in PATH (for example, /usr/local/bin), and after that
@@ -39,7 +39,7 @@ _all_args=()
 # the first arg
 _sync_or_not_sync=''
 # a regex for sanitizing args
-_arg_regex='^[a-zA-Z0-9._=:+/\-]+$'
+_arg_regex='^[a-zA-Z0-9._=:+/\@\-]+$'
 # where to log emerge --sync output
 _log_file='/var/log/emerge-sync.log'
 
@@ -60,7 +60,7 @@ done
 
 function main {
 
-	if [[ "${_sync_or_not_sync}" == '--sync' ]] ; then
+	if [[ "${_sync_or_not_sync}" == '--sync' ]]; then
 		local __current_date=$(date +%Y-%m-%d\ %H:%M:%S)
 		local __lines_with_date='
 emerger.sh: '"${__current_date}"'
