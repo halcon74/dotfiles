@@ -48,13 +48,13 @@ for _arg in "$@"; do
 	_all_args+=("${_arg}")
 	let "_arg_num+=1"
 	if [[ ! "${_arg}" =~ ${_arg_regex} ]]; then
-		exit_err_1 'The parameter #'"${_arg_num}"' does not match the regex '"${_arg_regex}"
+		exit_err_1 "${0}"': The parameter #'"${_arg_num}"' does not match the regex '"${_arg_regex}"
 	fi
 	if [[ ${_arg_num} -eq 1 ]]; then
 		_sync_or_not_sync="${_arg}"
 	fi
 	if [[ ${_arg_num} -ne 1 && "${_arg}" == '--sync' ]]; then
-		exit_err_1 'The parameter --sync not allowed as $'"${_arg_num}"' (allowed as $1 only)'
+		exit_err_1 "${0}"': The parameter --sync not allowed as $'"${_arg_num}"' (allowed as $1 only)'
 	fi
 done
 
