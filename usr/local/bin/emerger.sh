@@ -63,13 +63,16 @@ function main {
 	if [[ "${_sync_or_not_sync}" == '--sync' ]]; then
 		local __current_date=$(date +%Y-%m-%d\ %H:%M:%S)
 		local __lines_with_date='
-emerger.sh: '"${__current_date}"'
+'"${0}"': '"${__current_date}"'
 '
 		echo "${__lines_with_date}" >> "${_log_file}"
 		emerge "${_all_args[@]}" --color=y | tee -a "${_log_file}"
 	else
 		emerge "${_all_args[@]}"
 	fi
+
+	echo 'This emerge call has been wrapped by '"${0}"'
+'
 
 }
 
