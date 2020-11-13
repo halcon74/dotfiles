@@ -23,14 +23,7 @@
 #
 # # # # # HEADS-UP ! # # # # #
 #
-# DON'T FORGET to add something like
-# /var/log/emerge-sync.log {
-#	olddir /var/log/rotated/
-#	postrotate
-#		logger -p user.alert "emerge-sync.log has been rotated."
-#	endscript
-# }
-# to your /etc/logrotate.conf !
+# DON'T FORGET to add /var/log/emerge-sync.log to your logrotate configuration !
 
 source /usr/local/bin/mclass_utilities.sh
 
