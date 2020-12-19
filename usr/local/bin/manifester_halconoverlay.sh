@@ -68,6 +68,14 @@ function clear_my_active_path {
 
 }
 
+function set_my_active_path {
+
+	local __setting_path="${1}"
+
+	_active_path="${__setting_path}"
+
+}
+
 function handle_manifests {
 
 	local __manifest_file="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"'/Manifest'
@@ -98,11 +106,13 @@ function handle_manifests {
 function handle_folders {
 
 	local __find_folders=$(find "${HALCONOVERLAY_LOCAL_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+	local __active_path_without_folders="${_active_path}"
 
 	local __find_folder
 	for __find_folder in $(echo "${__find_folders}"); do
 		local __find_foldername="${__find_folder##*/}"
 
+		set_my_active_path "${__active_path_without_folders}"
 		add_to_my_active_path "${__find_foldername}"
 		handle_manifests
 
