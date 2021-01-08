@@ -277,6 +277,24 @@ function handle_tree_files {
 
 }
 
+function handle_tree_folders {
+
+	local __find_tree_folders=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+
+	local __active_path_without_tree_folders="${_active_path}"
+	
+	local __find_tree_folder
+	for __find_tree_folder in $(echo "${__find_tree_folders}"); do
+		local __find_foldername="${__find_tree_folder##*/}"
+
+		set_my_active_path "${__active_path_without_tree_folders}"
+		add_to_my_active_path "${__find_foldername}"
+		mkdir_n_chown 'portage'
+		handle_tree_files 'no_check' || exit $?
+	done
+	
+}
+
 function handle_folders {
 
 	local __find_folders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
@@ -304,6 +322,7 @@ function handle_folders {
 				add_to_my_active_path "${__find_subfoldername}"
 				mkdir_n_chown 'root'
 				handle_tree_files 'no_check'
+				handle_tree_folders || exit $?
 			else
 				add_to_my_active_path "${__find_subfoldername}"
 				exit_err_1 'Wrong subfolder '"${_active_path}"
