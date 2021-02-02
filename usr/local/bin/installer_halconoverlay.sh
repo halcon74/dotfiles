@@ -50,7 +50,7 @@ _metadata_portage_files=()
 _overlay_files=('overlay.xml' 'README.md')
 _overlay_portage_files=()
 
-_profiles_files=('package.unmask' 'repo_name' 'use.desc' 'use.local.desc')
+_profiles_files=('package.mask' 'package.unmask' 'repo_name' 'use.desc' 'use.local.desc')
 _profiles_portage_files=()
 
 _tree_files=('Manifest' 'metadata.xml')
