@@ -92,6 +92,9 @@ function handle_manifests {
 		if [[ "${__find_filename}" =~ ^.+\.ebuild$ ]]; then
 			set -x
 			ebuild "${__find_file}" manifest
+			if [[ $? != 0 ]]; then
+				exit_err_1 'ebuild returned ERROR'
+			fi
 			set +x
 		fi
 	done
