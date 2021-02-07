@@ -4,7 +4,7 @@
 # Regenerating manifests and synchronizing a Gentoo overlay in a location, owned by root and portage, with a hg (Mercurial) repository, owned by user
 # Should be called by root (got by user with `su`, in a terminal/console opened by user, see _user_name)
 #
-# The script uses the following Environment Variables: ( HALCONOVERLAY_LOCAL_DIR HALCONHG_DIR )
+# The script uses the following Environment Variables: ( MVAR_DIR_EREPO_LOCAL MVAR_DIR_MYPROG_HOV )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
@@ -23,24 +23,22 @@
 
 source /usr/local/bin/mclass_utilities.sh
 
-# Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
+MVAR_DIR_EREPO_LOCAL=$(read_env_or_conf_var 'MVAR_DIR_EREPO_LOCAL' "${_conf_file}") || exit $?
+MVAR_DIR_MYPROG_HOV=$(read_env_or_conf_var 'MVAR_DIR_MYPROG_HOV' "${_conf_file}") || exit $?
 
-HALCONOVERLAY_LOCAL_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_LOCAL_DIR' "${_conf_file}") || exit $?
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
-
-if [[ -z "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_LOCAL_DIR is not set'
+if [[ -z "${MVAR_DIR_EREPO_LOCAL}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_LOCAL is not set'
 fi
-if [[ -z "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR is not set'
+if [[ -z "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV is not set'
 fi
 
-if [[ ! -d "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_LOCAL_DIR='"${HALCONOVERLAY_LOCAL_DIR}"': No such diectory'
+if [[ ! -d "${MVAR_DIR_EREPO_LOCAL}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_LOCAL='"${MVAR_DIR_EREPO_LOCAL}"': No such diectory'
 fi
-if [[ ! -d "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such diectory'
+if [[ ! -d "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV='"${MVAR_DIR_MYPROG_HOV}"': No such diectory'
 fi
 
 _user_name=$(get_user_name_from_tty)
@@ -48,7 +46,7 @@ _user_name=$(get_user_name_from_tty)
 # Set in functions add_to_my_active_path and clear_my_active_path
 _active_path=''
 
-_categories=$(find "${HALCONOVERLAY_LOCAL_DIR}" -maxdepth 1 -mindepth 1 -type d | sort)
+_categories=$(find "${MVAR_DIR_EREPO_LOCAL}" -maxdepth 1 -mindepth 1 -type d | sort)
 
 function add_to_my_active_path {
 
@@ -78,13 +76,13 @@ function set_my_active_path {
 
 function handle_manifests {
 
-	local __manifest_file="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"'/Manifest'
+	local __manifest_file="${MVAR_DIR_EREPO_LOCAL}${_active_path}"'/Manifest'
 
 	set -x
 	rm "${__manifest_file}"
 	set +x
 
-	local __find_files=$(find "${HALCONOVERLAY_LOCAL_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${MVAR_DIR_EREPO_LOCAL}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
@@ -100,15 +98,15 @@ function handle_manifests {
 	done
 
 	local __manifest_filename="${__manifest_file##*/}"
-	local __full_file_name="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"'/'"${__manifest_filename}"
-	local __dest_dir="${HALCONHG_DIR}${_active_path}"
+	local __full_file_name="${MVAR_DIR_EREPO_LOCAL}${_active_path}"'/'"${__manifest_filename}"
+	local __dest_dir="${MVAR_DIR_MYPROG_HOV}${_active_path}"
 	cp_n_chown_n_chmod "${__full_file_name}" "${_user_name}"':'"${_user_name}" 644 "${__dest_dir}" || exit $?
 
 }
 
 function handle_folders {
 
-	local __find_folders=$(find "${HALCONOVERLAY_LOCAL_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+	local __find_folders=$(find "${MVAR_DIR_EREPO_LOCAL}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	local __active_path_without_folders="${_active_path}"
 
 	local __find_folder
@@ -117,7 +115,7 @@ function handle_folders {
 
 		set_my_active_path "${__active_path_without_folders}"
 		add_to_my_active_path "${__find_foldername}"
-		handle_manifests
+		handle_manifests || exit $?
 
 	done
 

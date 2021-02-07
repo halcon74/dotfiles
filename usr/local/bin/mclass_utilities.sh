@@ -66,6 +66,18 @@ function check_uid_gid {
 }
 
 # calling example:
+# _compare_birth_access || exit $?
+function _compare_birth_access {
+
+	local _birth_date=$(stat --format=%W /etc/os-release)
+	local _access_date=$(stat --format=%X /etc/os-release)
+	if [[ "${_birth_date}" -gt "${_access_date}" ]]; then
+		exit_err_1 'It looks like birth date is not supported by the filesysytem'
+	fi
+
+}
+
+# calling example:
 # cp_n_chown_n_chmod "${__my_script}" 'root:'"${_user_name}" 750 "${_my_dest_dir}" || exit $?
 function cp_n_chown_n_chmod {
 
@@ -166,14 +178,24 @@ function get_newest_dir {
 	local __path="${1}"
 	local __exclude="${2}"
 
+	if [[ ! -d "${__path}" ]]; then
+		exit_err_1 'get_newest_dir: No such directory: '"${__path}"
+	fi
+
+	_compare_birth_access || exit_err_1 'Can'"'"'t get the newest dir (by birth date)'
+
+	local __full
 	if [[ -z "${__exclude}" ]]; then
-		echo $(ls -t "${__path}" | sed -n '1p')
+		__full=$(ls -dA1t --time=birth ${__path%/}/*/ | sed -n '1p')
 	else
 		if [[ "${__exclude}" =~ [[:space:]] ]]; then
 			exit_err_1 'Wrong __exclude '"${__exclude}"
 		fi
-		echo $(ls -t "${__path}" | grep -v "${__exclude}" | sed -n '1p')
+		__full=$(ls -dA1t --time=birth ${__path%/}/*/ | grep -v "${__exclude}" | sed -n '1p')
 	fi
+	local __result=$(echo "${__full}" | sed -r 's!'"${__path}"'!!' | sed -r 's!/!!g')
+
+	echo "${__result}"
 
 }
 
@@ -229,47 +251,86 @@ function join_for_shell_regex {
 }
 
 # calling example:
+# parse_var "${__var_containing}" 'no_quotes' || exit $?
+function parse_var {
+
+	local __var_containing="${1}"
+	local __mode="${2}"
+
+	if [[ -z "${__var_containing}" ]]; then
+		exit_err_1 'parse_var: __var_containing undefined'
+	fi
+	if [[ -z "${__mode}" ]]; then
+		exit_err_1 'parse_var: __mode undefined'
+	fi
+
+	declare -A regexes
+	regexes[no_quotes]='^[[:space:]]*[A-Z_]+=(.+)$'
+	regexes[single_quotes]='^[[:space:]]*[A-Z_]+='"'"'(.+)'"'"'$'
+	regexes[double_quotes]='^[[:space:]]*[A-Z_]+="(.+)"$'
+
+	local __active_mode=${regexes[${__mode}]}
+	if [[ -z "${__active_mode}" ]]; then
+		exit_err_1 'parse_var: can'"'"'t find regex for mode '"${__mode}"
+	fi
+
+	local __the_value=$(echo "${__var_containing}"| sed -r 's/'"${__active_mode}"'/\1/')
+	if [[ "${__the_value}" == "${__var_containing}" ]]; then
+		exit_err_1 'sed failed to find a value in the line ('"${__mode}"'): '"${__var_containing}"
+	fi
+
+	echo "${__the_value}"
+
+}
+
+# calling example:
 # HALCONHG_DIR=$(read_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
 function read_conf_var {
 
 	local __the_name="${1}"
 	local __the_conffile="${2}"
-
-	local __var_containing=$(egrep "^[[:space:]]*${__the_name}=[^=]*$" "${__the_conffile}")
-	local __var_containing_lines=$(echo "${__var_containing}" | wc -l)
 	
-	if [[ __var_containing_lines -gt 1 ]]; then
-		exit_err_1 "Found ${__var_containing_lines} entries for ${__the_name}"
-	fi
-	
-	local __check_no_quotes=$(echo "${__var_containing}" | egrep -v $'=(\'|\")')
-	local __check_single_quotes=$(echo "${__var_containing}" | egrep $'=\'')
-	local __check_double_quotes=$(echo "${__var_containing}" | egrep $'=\"')
 	local __the_value
+#	__the_value=$(some_alternate_way_to_get_the_value) || exit $?
 	
-	if [[ -n "${__check_no_quotes}" ]]; then
-		__the_value=$(echo "${__var_containing}"| sed -r 's/.+=(.+)$/\1/')
-		local __check_quotes_inside=$(echo "${__the_value}" | egrep $'(\'|\")')
-		if [[ -n "${__check_quotes_inside}" ]]; then
-			exit_err_1 "Found quotes inside ${__the_name}"
-		fi
-	elif [[ -n "${__check_single_quotes}" ]]; then
-		__the_value=$(echo "${__var_containing}"| sed -r "s/.+='(.+)'$/\1/")
-		local __check_single_quotes_inside=$(echo "${__the_value}" | egrep $'\'')
-		if [[ -n "${__check_single_quotes_inside}" ]]; then
-			exit_err_1 "Found single quotes inside ${__the_name}"
-		fi
-	elif [[ -n "${__check_double_quotes}" ]]; then
-		__the_value=$(echo "${__var_containing}"| sed -r 's/.+="(.+)"$/\1/')
-		local __check_double_quotes_inside=$(echo "${__the_value}" | egrep $'\"')
-		if [[ -n "${__check_double_quotes_inside}" ]]; then
-			exit_err_1 "Found double quotes inside ${__the_name}"
-		fi
+	if [[ -n "${__the_value}" ]]; then
+		echo "${__the_value}"
 	else
-		exit_err_1 'A very interesting case'
-	fi
+		local __var_containing=$(egrep "^[[:space:]]*${__the_name}=[^=]*$" "${__the_conffile}")
+		local __var_containing_lines=$(echo "${__var_containing}" | wc -l)
+		
+		if [[ __var_containing_lines -gt 1 ]]; then
+			exit_err_1 "Found ${__var_containing_lines} entries for ${__the_name}"
+		fi
+		
+		local __check_no_quotes=$(echo "${__var_containing}" | egrep -v $'=(\'|\")')
+		local __check_single_quotes=$(echo "${__var_containing}" | egrep $'=\'')
+		local __check_double_quotes=$(echo "${__var_containing}" | egrep $'=\"')
+		
+		if [[ -n "${__check_no_quotes}" ]]; then
+			__the_value=$(parse_var "${__var_containing}" 'no_quotes') || exit $?
+			local __check_quotes_inside=$(echo "${__the_value}" | egrep $'(\'|\")')
+			if [[ -n "${__check_quotes_inside}" ]]; then
+				exit_err_1 "Found quotes inside ${__the_name}"
+			fi
+		elif [[ -n "${__check_single_quotes}" ]]; then
+			__the_value=$(parse_var "${__var_containing}" 'single_quotes') || exit $?
+			local __check_single_quotes_inside=$(echo "${__the_value}" | egrep $'\'')
+			if [[ -n "${__check_single_quotes_inside}" ]]; then
+				exit_err_1 "Found single quotes inside ${__the_name}"
+			fi
+		elif [[ -n "${__check_double_quotes}" ]]; then
+			__the_value=$(parse_var "${__var_containing}" 'double_quotes') || exit $?
+			local __check_double_quotes_inside=$(echo "${__the_value}" | egrep $'\"')
+			if [[ -n "${__check_double_quotes_inside}" ]]; then
+				exit_err_1 "Found double quotes inside ${__the_name}"
+			fi
+		else
+			exit_err_1 'A very interesting case'
+		fi
 
-	echo "${__the_value}"
+		echo "${__the_value}"
+	fi
 
 }
 

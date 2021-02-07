@@ -5,7 +5,7 @@
 # Checking that files/folders names are permitted in the overlay
 # Should be called by root
 #
-# The script uses the following Environment Variables: ( HALCONOVERLAY_LOCAL_DIR HALCONHG_DIR )
+# The script uses the following Environment Variables: ( MVAR_DIR_EREPO_LOCAL MVAR_DIR_MYPROG_HOV )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
@@ -24,24 +24,22 @@
 
 source /usr/local/bin/mclass_utilities.sh
 
-# Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
+MVAR_DIR_EREPO_LOCAL=$(read_env_or_conf_var 'MVAR_DIR_EREPO_LOCAL' "${_conf_file}") || exit $?
+MVAR_DIR_MYPROG_HOV=$(read_env_or_conf_var 'MVAR_DIR_MYPROG_HOV' "${_conf_file}") || exit $?
 
-HALCONOVERLAY_LOCAL_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_LOCAL_DIR' "${_conf_file}") || exit $?
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
-
-if [[ -z "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_LOCAL_DIR is not set'
+if [[ -z "${MVAR_DIR_EREPO_LOCAL}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_LOCAL is not set'
 fi
-if [[ -z "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR is not set'
+if [[ -z "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV is not set'
 fi
 
-if [[ ! -d "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_LOCAL_DIR='"${HALCONOVERLAY_LOCAL_DIR}"': No such directory'
+if [[ ! -d "${MVAR_DIR_EREPO_LOCAL}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_LOCAL='"${MVAR_DIR_EREPO_LOCAL}"': No such directory'
 fi
-if [[ ! -d "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such directory'
+if [[ ! -d "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV='"${MVAR_DIR_MYPROG_HOV}"': No such directory'
 fi
 
 _metadata_files=('layout.conf')
@@ -74,7 +72,7 @@ _egrep_v_files_joined=$(join_for_shell_regex "${_egrep_v_files[@]}")
 _egrep_v_folders_joined=$(join_for_shell_regex "${_egrep_v_folders[@]}")
 _egrep_v_diff_joined=$(join_for_shell_regex "${_egrep_v_diff[@]}")
 
-_categories=$(find "${HALCONHG_DIR}" -maxdepth 1 -mindepth 1 -type d | egrep -v "${_egrep_v_folders_joined}" | sort)
+_categories=$(find "${MVAR_DIR_MYPROG_HOV}" -maxdepth 1 -mindepth 1 -type d | egrep -v "${_egrep_v_folders_joined}" | sort)
 
 function set_my_active_files {
 
@@ -129,8 +127,8 @@ function mkdir_n_chown {
 		echo
 
 		set -x
-		mkdir -p "${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
-		chown "${__dir_owner}":"${__dir_owner}" "${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
+		mkdir -p "${MVAR_DIR_EREPO_LOCAL}${_active_path}"
+		chown "${__dir_owner}":"${__dir_owner}" "${MVAR_DIR_EREPO_LOCAL}${_active_path}"
 		set +x
 	else
 		exit_err_1 'Wrong __dir_owner '"${__dir_owner}"
@@ -140,10 +138,10 @@ function mkdir_n_chown {
 
 function handle_overlay_dir {
 
-	if [[ -d "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
+	if [[ -d "${MVAR_DIR_EREPO_LOCAL}" ]]; then
 		echo
 		echo 'ATTENTION! Delete this directory?
-   '"${HALCONOVERLAY_LOCAL_DIR}"'
+   '"${MVAR_DIR_EREPO_LOCAL}"'
 (y/n)
 If you choose '"'"'n'"'"', the script will be interrupted'
 		local USER_CHOICE
@@ -152,9 +150,9 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		if [[ "${USER_CHOICE}" == 'y' || "${USER_CHOICE}" == 'Y' ]]; then
 			echo
 			set -x
-			rm -r "${HALCONOVERLAY_LOCAL_DIR}"
-			mkdir -p "${HALCONOVERLAY_LOCAL_DIR}"
-			chown root:root "${HALCONOVERLAY_LOCAL_DIR}"
+			rm -r "${MVAR_DIR_EREPO_LOCAL}"
+			mkdir -p "${MVAR_DIR_EREPO_LOCAL}"
+			chown root:root "${MVAR_DIR_EREPO_LOCAL}"
 			set +x
 		else
 			echo
@@ -162,8 +160,8 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 		fi
 	else
 		set -x
-		mkdir -p "${HALCONOVERLAY_LOCAL_DIR}"
-		chown root:root "${HALCONOVERLAY_LOCAL_DIR}"
+		mkdir -p "${MVAR_DIR_EREPO_LOCAL}"
+		chown root:root "${MVAR_DIR_EREPO_LOCAL}"
 		set +x
 	fi
 
@@ -171,15 +169,15 @@ If you choose '"'"'n'"'"', the script will be interrupted'
 
 function handle_overlay_files {
 
-	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | egrep -v "${_egrep_v_files_joined}" |sort)
+	local __find_files=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type f | egrep -v "${_egrep_v_files_joined}" |sort)
 
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
 
-		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
+		local __full_file_name="${MVAR_DIR_MYPROG_HOV}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${MVAR_DIR_EREPO_LOCAL}${_active_path}"
 
 		set_my_active_files "overlay" 0
 		local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -197,15 +195,15 @@ function handle_service_files {
 
 	local __category_name="${1}"
 
-	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
 
-		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
+		local __full_file_name="${MVAR_DIR_MYPROG_HOV}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${MVAR_DIR_EREPO_LOCAL}${_active_path}"
 
 		if [[ "${__category_name}" == 'eclass' ]]; then
 			if [[ "${__find_filename}" =~ ^.+\.eclass$ ]]; then
@@ -240,15 +238,15 @@ function handle_tree_files {
 
 	local __no_tree_check="${1}"
 
-	local __find_files=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
+	local __find_files=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type f | sort)
 
 	local __find_file
 	for __find_file in $(echo "${__find_files}"); do
 		local __find_filename="${__find_file##*/}"
 		echo
 
-		local __full_file_name="${HALCONHG_DIR}${_active_path}"'/'"${__find_filename}"
-		local __dest_dir="${HALCONOVERLAY_LOCAL_DIR}${_active_path}"
+		local __full_file_name="${MVAR_DIR_MYPROG_HOV}${_active_path}"'/'"${__find_filename}"
+		local __dest_dir="${MVAR_DIR_EREPO_LOCAL}${_active_path}"
 
 		if [[ -n "${__no_tree_check}" && "${__no_tree_check}" == 'no_check' ]]; then
 			local __find_in_my_files=$(find_in_array "${__find_filename}" "${_active_files[@]}")
@@ -297,7 +295,7 @@ function handle_tree_folders {
 
 function handle_folders {
 
-	local __find_folders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+	local __find_folders=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 	local __active_path_without_folders="${_active_path}"
 
 	local __find_folder
@@ -307,9 +305,9 @@ function handle_folders {
 		set_my_active_path "${__active_path_without_folders}"
 		add_to_my_active_path "${__find_foldername}"
 		mkdir_n_chown 'portage'
-		handle_tree_files ''
+		handle_tree_files '' || exit $?
 
-		local __find_subfolders=$(find "${HALCONHG_DIR}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
+		local __find_subfolders=$(find "${MVAR_DIR_MYPROG_HOV}${_active_path}" -maxdepth 1 -mindepth 1 -type d | sort)
 
 		local __find_subfolder
 		for __find_subfolder in $(echo "${__find_subfolders}"); do
@@ -321,7 +319,7 @@ function handle_folders {
 			if [[ ${__found_in_my_subfolders} -eq 1 ]]; then
 				add_to_my_active_path "${__find_subfoldername}"
 				mkdir_n_chown 'root'
-				handle_tree_files 'no_check'
+				handle_tree_files 'no_check' || exit $?
 				handle_tree_folders || exit $?
 			else
 				add_to_my_active_path "${__find_subfoldername}"
@@ -337,7 +335,7 @@ function check_diff {
 	echo
 	echo
 
-	local __diff_ur=$(diff -ur "${HALCONHG_DIR}" "${HALCONOVERLAY_LOCAL_DIR}" | egrep -v "${_egrep_v_diff_joined}")
+	local __diff_ur=$(diff -ur "${MVAR_DIR_MYPROG_HOV}" "${MVAR_DIR_EREPO_LOCAL}" | egrep -v "${_egrep_v_diff_joined}")
 
 	if [[ "${__diff_ur}" != '' ]]; then
 		exit_err_1 '__diff_ur non-empty: 
@@ -349,7 +347,7 @@ function check_diff {
 function main {
 
 	handle_overlay_dir
-	handle_overlay_files
+	handle_overlay_files || exit $?
 
 	local __my_category
 	for __my_category in $(echo "${_categories}"); do
@@ -361,7 +359,7 @@ function main {
 		mkdir_n_chown 'portage'
 
 		if [[ "${__category_name}" == 'metadata' || "${__category_name}" == 'profiles' || "${__category_name}" == 'eclass' || "${__category_name}" == 'licenses' ]]; then
-			handle_service_files "${__category_name}"
+			handle_service_files "${__category_name}" || exit $?
 		elif [[ "${__category_name}" =~ ^[^\-]+\-[^\-]+$ ]]; then
 			handle_folders
 		else

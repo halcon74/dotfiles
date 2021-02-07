@@ -3,7 +3,7 @@
 # Helper script for pushing to halcon-overlay
 # Pushes a local hg (Mercurial) repository with different branches and bookmarks to a remote repository in the way compatible with hg-git
 #
-# The script uses the following Environment Variables: ( HALCONHG_DIR HALCONHG_REMOTE )
+# The script uses the following Environment Variables: ( MVAR_DIR_MYPROG_HOV MVAR_DIR_REMOTE_HOV )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
@@ -32,25 +32,23 @@ if [[ -z "${_branch}" ]]; then
 	exit_err_1 'branch argument is not passed'
 fi
 
-# Example file: installer_halconoverlay.conf.example
 _conf_file='/usr/local/bin/installer_halconoverlay.conf'
+MVAR_DIR_REMOTE_HOV=$(read_env_or_conf_var 'MVAR_DIR_REMOTE_HOV' "${_conf_file}") || exit $?
+MVAR_DIR_MYPROG_HOV=$(read_env_or_conf_var 'MVAR_DIR_MYPROG_HOV' "${_conf_file}") || exit $?
 
-HALCONHG_DIR=$(read_env_or_conf_var 'HALCONHG_DIR' "${_conf_file}") || exit $?
-HALCONHG_REMOTE=$(read_env_or_conf_var 'HALCONHG_REMOTE' "${_conf_file}") || exit $?
-
-if [[ -z "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR is not set'
+if [[ -z "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV is not set'
 fi
-if [[ -z "${HALCONHG_REMOTE}" ]]; then
-	exit_err_1 'HALCONHG_REMOTE is not set'
+if [[ -z "${MVAR_DIR_REMOTE_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_REMOTE_HOV is not set'
 fi
 
-if [[ ! -d "${HALCONHG_DIR}" ]]; then
-	exit_err_1 'HALCONHG_DIR='"${HALCONHG_DIR}"': No such diectory'
+if [[ ! -d "${MVAR_DIR_MYPROG_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_MYPROG_HOV='"${MVAR_DIR_MYPROG_HOV}"': No such diectory'
 fi
 
 set -x
-pushd "${HALCONHG_DIR}"
+pushd "${MVAR_DIR_MYPROG_HOV}"
 set +x
 
 _exists_branch=$(hg branches | grep "${_branch}" | wc -l)
@@ -66,7 +64,7 @@ fi
 
 set -x
 LC_ALL=C hg bookmark --rev tip "${_bookmark}"
-LC_ALL=C hg push --verbose "${HALCONHG_REMOTE}"
+LC_ALL=C hg push --verbose "${MVAR_DIR_REMOTE_HOV}"
 popd
 set +x
 

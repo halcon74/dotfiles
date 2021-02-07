@@ -8,7 +8,7 @@
 # Yes, I know, it's re-inventing the wheel; I wrote it just as an exercise
 # Should be called by root
 #
-# The script uses the following Environment Variables: ( HALCONOVERLAY_LOCAL_DIR HALCONOVERLAY_REMOTE_DIR )
+# The script uses the following Environment Variables: ( MVAR_DIR_EREPO_LOCAL MVAR_DIR_EREPO_HOV )
 #
 # Copyright (C) 2020 Alexey Mishustin halcon@tuta.io
 #
@@ -36,23 +36,24 @@ source /usr/local/bin/mclass_utilities.sh
 if [[ -z "${_local_or_remote}" ]]; then
 	exit_err_1 '_local_or_remote argument is not passed'
 fi
-
-# Example file: installer_halconoverlay.conf.example
-_conf_file='/usr/local/bin/installer_halconoverlay.conf'
-
-HALCONOVERLAY_LOCAL_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_LOCAL_DIR' "${_conf_file}") || exit $?
-HALCONOVERLAY_REMOTE_DIR=$(read_env_or_conf_var 'HALCONOVERLAY_REMOTE_DIR' "${_conf_file}") || exit $?
-
-if [[ -z "${HALCONOVERLAY_LOCAL_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_LOCAL_DIR is not set'
+if [[ "${_local_or_remote}" != 'local' && "${_local_or_remote}" != 'remote' ]]; then
+	exit_err_1 'wrong value of _local_or_remote argument'
 fi
-if [[ -z "${HALCONOVERLAY_REMOTE_DIR}" ]]; then
-	exit_err_1 'HALCONOVERLAY_REMOTE_DIR is not set'
+
+_conf_file='/usr/local/bin/installer_halconoverlay.conf'
+MVAR_DIR_EREPO_LOCAL=$(read_env_or_conf_var 'MVAR_DIR_EREPO_LOCAL' "${_conf_file}") || exit $?
+MVAR_DIR_EREPO_HOV=$(read_env_or_conf_var 'MVAR_DIR_EREPO_HOV' "${_conf_file}") || exit $?
+
+if [[ -z "${MVAR_DIR_EREPO_LOCAL}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_LOCAL is not set'
+fi
+if [[ -z "${MVAR_DIR_EREPO_HOV}" ]]; then
+	exit_err_1 'MVAR_DIR_EREPO_HOV is not set'
 fi
 
 declare -A _repo_name
-_repo_name['local']="${HALCONOVERLAY_LOCAL_DIR##*/}"
-_repo_name['remote']="${HALCONOVERLAY_REMOTE_DIR##*/}"
+_repo_name['local']="${MVAR_DIR_EREPO_LOCAL##*/}"
+_repo_name['remote']="${MVAR_DIR_EREPO_HOV##*/}"
 
 declare -A _repo_enabled
 _repo_enabled['local']=$(eselect repository list -i | grep ${_repo_name['local']} | wc -l)
@@ -208,7 +209,7 @@ function main {
 	if [[ "${_local_or_remote}" == 'local' ]]; then
 		# 'halcon-overlay' can remain in 'localrepo' after the work of installer_halconoverlay
 		set -x
-		echo "${_repo_name['local']}" > "${HALCONOVERLAY_LOCAL_DIR}/profiles/repo_name"
+		echo "${_repo_name['local']}" > "${MVAR_DIR_EREPO_LOCAL}/profiles/repo_name"
 		set +x
 	fi
 
@@ -230,4 +231,3 @@ function main {
 main
 
 exit 0
-
